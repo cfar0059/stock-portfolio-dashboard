@@ -2,11 +2,11 @@
 // app/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
+import {useEffect, useState} from "react";
+import {Header} from "@/components/Header";
 // import { SummaryCards } from "@/components/SummaryCards";
-import { PositionsSection } from "@/components/PositionsSection";
-import { Position } from "@/lib/positions";
+import {PositionsSection} from "@/components/PositionsSection";
+import {Position} from "@/lib/positions";
 
 const POSITIONS_STORAGE_KEY = "portfolio-positions";
 
@@ -18,6 +18,7 @@ export default function HomePage() {
   const [newShares, setNewShares] = useState("");
   const [newBuyPrice, setNewBuyPrice] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [editingPosition, setEditingPosition] = useState<Position | null>(null);
 
   // Load positions from localStorage on first mount
   useEffect(() => {
@@ -80,19 +81,55 @@ export default function HomePage() {
       return;
     }
 
-    const newPosition: Position = {
-      id: `${trimmedSymbol}-${Date.now()}`,
-      symbol: trimmedSymbol,
-      shares: sharesNumber,
-      buyPrice: buyPriceNumber,
-    };
+    if (editingPosition) {
+      // Update existing position
+      setPositions((prev) =>
+        prev.map((position) =>
+          position.id === editingPosition.id
+            ? {
+                ...position,
+                symbol: trimmedSymbol,
+                shares: sharesNumber,
+                buyPrice: buyPriceNumber,
+              }
+            : position
+        )
+      );
+    } else {
+      // Create new position
+      const newPosition: Position = {
+        id: `${trimmedSymbol}-${Date.now()}`,
+        symbol: trimmedSymbol,
+        shares: sharesNumber,
+        buyPrice: buyPriceNumber,
+      };
+      setPositions((prev) => [...prev, newPosition]);
+    }
 
-    setPositions((prev) => [...prev, newPosition]);
+    // Clear form and exit edit mode
     setNewSymbol("");
     setNewShares("");
     setNewBuyPrice("");
+    setEditingPosition(null);
     setIsAddOpen(false);
     setRefreshToken((prev) => prev + 1);
+  }
+
+  function handleEditPosition(position: Position) {
+    setEditingPosition(position);
+    setNewSymbol(position.symbol);
+    setNewShares(String(position.shares));
+    setNewBuyPrice(String(position.buyPrice));
+    setIsAddOpen(true);
+    setFormError(null);
+  }
+
+  function handleCancelEdit() {
+    setEditingPosition(null);
+    setNewSymbol("");
+    setNewShares("");
+    setNewBuyPrice("");
+    setFormError(null);
   }
 
   function handleRemovePosition(symbol: string) {
@@ -114,15 +151,19 @@ export default function HomePage() {
       <PositionsSection
         isAddOpen={isAddOpen}
         symbols={symbols}
+        positions={positions}
         refreshToken={refreshToken}
         newSymbol={newSymbol}
         newShares={newShares}
         newBuyPrice={newBuyPrice}
         formError={formError}
+        editingPosition={editingPosition}
         onSymbolChange={setNewSymbol}
         onSharesChange={setNewShares}
         onBuyPriceChange={setNewBuyPrice}
         onAddPosition={handleAddPosition}
+        onEditPosition={handleEditPosition}
+        onCancelEdit={handleCancelEdit}
         onRemovePosition={handleRemovePosition}
       />
     </main>
