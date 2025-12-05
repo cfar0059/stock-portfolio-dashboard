@@ -1,18 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
-import type { Stock, StockResponse } from "@/lib/stockData";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import {useEffect, useState} from "react";
+import {X} from "lucide-react";
+import type {Stock, StockResponse} from "@/lib/stockData";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {SourceIndicator} from "@/components/SourceIndicator";
 
 interface StockDashboardProps {
   symbols: string[];
@@ -28,6 +22,8 @@ export function StockDashboard({
   const [stocks, setStocks] = useState<StockResponse>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortColumn, setSortColumn] = useState<keyof Stock | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     // Don't fetch if there are no symbols
@@ -69,6 +65,43 @@ export function StockDashboard({
     void loadStocks();
   }, [symbols, refreshToken]);
 
+  const handleSort = (column: keyof Stock) => {
+    if (sortColumn === column) {
+      // Toggle direction if clicking the same column
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new column and default to ascending
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const sortedStocks = [...stocks].sort((a, b) => {
+    if (!sortColumn) return 0;
+
+    const aValue = a[sortColumn];
+    const bValue = b[sortColumn];
+
+    // Handle different types
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+    }
+
+    // String comparison
+    const aStr = String(aValue).toLowerCase();
+    const bStr = String(bValue).toLowerCase();
+    const comparison = aStr.localeCompare(bStr);
+
+    return sortDirection === "asc" ? comparison : -comparison;
+  });
+
+  const getSortIndicator = (column: keyof Stock) => {
+    if (sortColumn === column) {
+      return sortDirection === "asc" ? "↑" : "↓";
+    }
+    return "↕";
+  };
+
   if (loading) {
     return <div>Loading stocks...</div>;
   }
@@ -97,28 +130,32 @@ export function StockDashboard({
           <Table className="min-w-full text-sm">
             <TableHeader>
               <TableRow className="border-b border-slate-800 bg-slate-900 hover:bg-slate-900">
-                <TableHead className="px-4 py-2 text-xs font-medium text-slate-400">
-                  Symbol
+                <TableHead
+                  className="px-4 py-2 text-xs font-medium text-slate-400 cursor-pointer hover:text-slate-200"
+                  onClick={() => handleSort("symbol")}
+                >
+                  Symbol <span className={sortColumn === "symbol" ? "text-slate-200" : "text-slate-500"}>{getSortIndicator("symbol")}</span>
                 </TableHead>
-                <TableHead className="px-4 py-2 text-xs font-medium text-slate-400">
-                  Price
+                <TableHead
+                  className="px-4 py-2 text-xs font-medium text-slate-400 cursor-pointer hover:text-slate-200"
+                  onClick={() => handleSort("price")}
+                >
+                  Price <span className={sortColumn === "price" ? "text-slate-200" : "text-slate-500"}>{getSortIndicator("price")}</span>
                 </TableHead>
-                <TableHead className="px-4 py-2 text-xs font-medium text-slate-400">
-                  Change
+                <TableHead
+                  className="px-4 py-2 text-xs font-medium text-slate-400 cursor-pointer hover:text-slate-200"
+                  onClick={() => handleSort("change")}
+                >
+                  Change <span className={sortColumn === "change" ? "text-slate-200" : "text-slate-500"}>{getSortIndicator("change")}</span>
                 </TableHead>
-                <TableHead className="px-4 py-2 text-xs font-medium text-slate-400">
-                  Currency
+                <TableHead className="px-4 py-2 text-xs font-medium text-slate-400 w-8">
                 </TableHead>
-                <TableHead className="px-4 py-2 text-xs font-medium text-slate-400">
-                  Source
-                </TableHead>
-                <TableHead className="px-4 py-2 text-xs font-medium text-slate-400">
-                  Action
+                <TableHead className="px-4 py-2 text-xs font-medium text-slate-400 w-8">
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {stocks.map((stock: Stock) => (
+              {sortedStocks.map((stock: Stock) => (
                 <TableRow
                   key={stock.symbol}
                   className="border-b border-slate-800 last:border-b-0 hover:bg-slate-900/60"
@@ -127,7 +164,7 @@ export function StockDashboard({
                     {stock.symbol}
                   </TableCell>
                   <TableCell className="px-4 py-2 text-slate-200">
-                    {stock.price.toFixed(2)}
+                    {stock.price.toFixed(2)} <span className="text-xs text-slate-400">{stock.currency}</span>
                   </TableCell>
                   <TableCell
                     className={`px-4 py-2 ${
@@ -136,19 +173,7 @@ export function StockDashboard({
                   >
                     {stock.change.toFixed(2)}
                   </TableCell>
-                  <TableCell className="px-4 py-2 text-slate-300">
-                    {stock.currency}
-                  </TableCell>
-                  <TableCell
-                    className={`px-4 py-2 ${
-                      stock.source === "cache"
-                        ? "text-yellow-400"
-                        : "text-blue-400"
-                    }`}
-                  >
-                    {stock.source}
-                  </TableCell>
-                  <TableCell className="px-4 py-2">
+                  <TableCell className="px-2 py-2 w-8">
                     <Button
                       variant="ghost"
                       size="icon-sm"
@@ -158,6 +183,9 @@ export function StockDashboard({
                     >
                       <X className="h-4 w-4" />
                     </Button>
+                  </TableCell>
+                  <TableCell className="px-4 py-2 text-center w-8">
+                    <SourceIndicator source={stock.source} />
                   </TableCell>
                 </TableRow>
               ))}
