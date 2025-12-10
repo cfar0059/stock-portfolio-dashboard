@@ -11,7 +11,7 @@ export function SourceIndicator({ source }: SourceIndicatorProps) {
 
   return (
     <div
-      className={`inline-block w-2 h-2 rounded-full ${bgColor}`}
+      className={`inline-block w-2 h-2 rounded-full mx-1 ${bgColor}`}
       title={tooltip}
       aria-label={tooltip}
     />

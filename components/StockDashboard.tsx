@@ -12,8 +12,8 @@ import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area";
 import {calculateProfit} from "@/lib/calculateProfit";
 
 // Constants
-const TABLE_HEAD_CLASS = "px-1 py-1 text-sm font-medium text-slate-400";
-const SORTABLE_HEAD_CLASS = `${TABLE_HEAD_CLASS} cursor-pointer hover:text-slate-200`;
+const TABLE_HEAD_CLASS = "px-2 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-medium text-slate-400 font-semibold";
+const SORTABLE_HEAD_CLASS = `${TABLE_HEAD_CLASS} cursor-pointer hover:text-slate-300 transition-colors`;
 const formatCurrency = (value: number): string =>
     value.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
@@ -23,10 +23,20 @@ const getProfitColor = (profit: number): string =>
 const mergePositionsWithStocks = (stocks: Stock[], positions: Position[]): Stock[] =>
     stocks.map((stock) => {
         const position = positions.find((p) => p.symbol === stock.symbol);
+        const shares = position?.shares || 0;
+        const buyPrice = position?.buyPrice || 0;
+
+        let profit = 0;
+        if (buyPrice && shares > 0) {
+            const {amount} = calculateProfit(stock.price, buyPrice, shares);
+            profit = amount;
+        }
+
         return {
             ...stock,
-            shares: position?.shares || 0,
-            buyPrice: position?.buyPrice || 0,
+            shares,
+            buyPrice,
+            profit,
         };
     });
 
@@ -63,7 +73,7 @@ interface ProfitCellProps {
 
 function ProfitCell({stock}: Readonly<ProfitCellProps>) {
     if (!stock.buyPrice || stock.shares <= 0) {
-        return <span className="text-slate-400">-</span>;
+        return <span className="text-slate-400 text-xs sm:text-sm">-</span>;
     }
 
     const {amount, percentage} = calculateProfit(
@@ -74,9 +84,9 @@ function ProfitCell({stock}: Readonly<ProfitCellProps>) {
     const textColor = getProfitColor(amount);
 
     return (
-        <div className={`${textColor} flex flex-col text-sm leading-tight`}>
-            <span>${formatCurrency(amount)}</span>
-            <span className="text-xs">({percentage.toFixed(2)}%)</span>
+        <div className={`${textColor} flex flex-col text-right text-xs sm:text-sm leading-relaxed`}>
+            <span className="font-medium">${formatCurrency(amount)}</span>
+            <span className="text-[10px] sm:text-xs opacity-90">({percentage.toFixed(2)}%)</span>
         </div>
     );
 }
@@ -98,9 +108,11 @@ function SortableHeader({
                             getSortIndicator,
                         }: Readonly<SortableHeaderProps>) {
     const isActive = sortColumn === column;
+    const isNumeric = ["price", "change", "shares", "buyPrice", "profit"].includes(column);
+
     return (
         <TableHead
-            className={SORTABLE_HEAD_CLASS}
+            className={`${SORTABLE_HEAD_CLASS} ${isNumeric ? "text-right" : ""}`}
             onClick={() => onSort(column)}
         >
             {label} <span className={isActive ? "text-slate-200" : "text-slate-500"}>{getSortIndicator(column)}</span>
@@ -202,7 +214,7 @@ export function StockDashboard({
         <ScrollArea>
             <Card className="border border-slate-800 bg-slate-900/60 text-slate-100">
                 <CardContent className="px-0 py-0">
-                    <Table className="w-full text-sm table-auto">
+                    <Table className="w-full border-separate border-spacing-y-1">
                         <TableHeader>
                             <TableRow className="border-b border-slate-800 bg-slate-900 hover:bg-slate-900">
                                 <SortableHeader
@@ -240,8 +252,15 @@ export function StockDashboard({
                                     onSort={handleSort}
                                     getSortIndicator={getSortIndicator}
                                 />
-                                <TableHead className={TABLE_HEAD_CLASS}>
-                                    Profit
+                                <SortableHeader
+                                    label="Profit"
+                                    column="profit"
+                                    sortColumn={sortColumn}
+                                    onSort={handleSort}
+                                    getSortIndicator={getSortIndicator}
+                                />
+                                <TableHead className={`${TABLE_HEAD_CLASS} text-right`}>
+                                    Actions
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -251,56 +270,55 @@ export function StockDashboard({
                                     key={stock.symbol}
                                     className="border-b border-slate-800 last:border-b-0 hover:bg-slate-900/60"
                                 >
-                                    <TableCell
-                                        className="px-1 py-1 font-medium text-slate-200 flex items-center gap-1 text-sm">
+                                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 font-medium text-slate-200 text-xs sm:text-sm whitespace-nowrap  min-w-[90px]">
                                         <SourceIndicator source={stock.source}/>
                                         {stock.symbol}
                                     </TableCell>
-                                    <TableCell className="px-1 py-1 text-sm text-slate-200 whitespace-nowrap">
-                                        {stock.price.toFixed(2)} <span
-                                        className="text-xs text-slate-400">{stock.currency}</span>
+                                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-200 text-right whitespace-nowrap min-w-[90px]">
+                                        {stock.price.toFixed(2)} <span className="text-[10px] sm:text-xs text-slate-400">{stock.currency}</span>
                                     </TableCell>
                                     <TableCell
-                                        className={`px-1 py-1 text-sm ${
+                                        className={`px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-right min-w-[80px] ${
                                             stock.change >= 0 ? "text-emerald-400" : "text-red-400"
                                         }`}
                                     >
                                         {stock.change.toFixed(2)}
                                     </TableCell>
-                                    <TableCell className="px-1 py-1 text-sm text-slate-200">
+                                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-200 text-right min-w-[70px]">
                                         {stock.shares}
                                     </TableCell>
-                                    <TableCell className="px-1 py-1 text-sm text-slate-200">
-                                        {stock.buyPrice ? `${stock.buyPrice.toFixed(2)} ` : "-"}
-                                        {stock.buyPrice &&
-                                            <span className="text-xs text-slate-400">{stock.currency}</span>}
+                                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-200 text-right min-w-[100px]">
+                                        {stock.buyPrice ? `${stock.buyPrice.toFixed(2)}` : "-"} {stock.buyPrice && <span className="text-[10px] sm:text-xs text-slate-400">{stock.currency}</span>}
                                     </TableCell>
-                                    <TableCell className="px-1 py-1 text-sm">
+                                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-right min-w-[110px]">
                                         <ProfitCell stock={stock}/>
                                     </TableCell>
-                                    <TableCell className="px-1 py-1 flex justify-end gap-0.5">                                        <Button
-                                            variant="ghost"
-                                            size="icon-sm"
-                                            onClick={() => {
-                                                const position = (positions || []).find((p) => p.symbol === stock.symbol);
-                                                if (position) {
-                                                    onEditPosition?.(position);
-                                                }
-                                            }}
-                                            className="hover:bg-blue-500/20 hover:text-blue-400"
-                                            aria-label={`Edit ${stock.symbol}`}
-                                        >
-                                            <Pencil className="h-3 w-3"/>
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon-sm"
-                                            onClick={() => onRemovePosition?.(stock.symbol)}
-                                            className="hover:bg-red-500/20 hover:text-red-400"
-                                            aria-label={`Remove ${stock.symbol}`}
-                                        >
-                                            <X className="h-3 w-3"/>
-                                        </Button>
+                                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-right min-w-[80px]">
+                                        <div className="flex justify-end gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon-sm"
+                                                onClick={() => {
+                                                    const position = (positions || []).find((p) => p.symbol === stock.symbol);
+                                                    if (position) {
+                                                        onEditPosition?.(position);
+                                                    }
+                                                }}
+                                                className="hover:bg-blue-500/20 hover:text-blue-400"
+                                                aria-label={`Edit ${stock.symbol}`}
+                                            >
+                                                <Pencil className="h-4 w-4"/>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon-sm"
+                                                onClick={() => onRemovePosition?.(stock.symbol)}
+                                                className="hover:bg-red-500/20 hover:text-red-400"
+                                                aria-label={`Remove ${stock.symbol}`}
+                                            >
+                                                <X className="h-4 w-4"/>
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}

@@ -17,6 +17,7 @@ export type Stock = {
   source: "cache" | "live";
   shares?: number;
   buyPrice?: number;
+  profit?: number;
 };
 
 type CacheEntry = {
