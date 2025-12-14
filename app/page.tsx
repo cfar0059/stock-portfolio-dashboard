@@ -12,7 +12,7 @@ const POSITIONS_STORAGE_KEY = "portfolio-positions";
 export default function HomePage() {
   const [refreshToken, setRefreshToken] = useState(0);
   const [positions, setPositions] = useState<Position[]>([]);
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(true);
   const [newSymbol, setNewSymbol] = useState("");
   const [newShares, setNewShares] = useState("");
   const [newBuyPrice, setNewBuyPrice] = useState("");

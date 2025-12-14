@@ -78,22 +78,46 @@ export function PositionsSection({
         </div>
       </div>
 
-      {isAddOpen && (
-        <AddPositionForm
-          newSymbol={newSymbol}
-          newShares={newShares}
-          newBuyPrice={newBuyPrice}
-          newDca={newDca}
-          formError={formError}
-          isEditing={editingPosition !== null}
-          onSymbolChange={onSymbolChange}
-          onSharesChange={onSharesChange}
-          onBuyPriceChange={onBuyPriceChange}
-          onDcaChange={onDcaChange}
-          onSubmit={onAddPosition}
-          onCancel={onCancelEdit}
-        />
-      )}
+      {/* Add Position Form with smooth drag-out animation using CSS Grid rows */}
+      <div
+        className={`grid will-change-[grid-template-rows,opacity,transform] ${
+          isAddOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+        style={{
+          transition:
+            "grid-template-rows 700ms cubic-bezier(0.16, 1, 0.3, 1), opacity 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
+        <div
+          className={`overflow-hidden min-h-0 ${
+            isAddOpen
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-1 pointer-events-none"
+          }`}
+          style={{
+            transition:
+              "opacity 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+          aria-hidden={!isAddOpen}
+        >
+          <div className="mb-4">
+            <AddPositionForm
+              newSymbol={newSymbol}
+              newShares={newShares}
+              newBuyPrice={newBuyPrice}
+              newDca={newDca}
+              formError={formError}
+              isEditing={editingPosition !== null}
+              onSymbolChange={onSymbolChange}
+              onSharesChange={onSharesChange}
+              onBuyPriceChange={onBuyPriceChange}
+              onDcaChange={onDcaChange}
+              onSubmit={onAddPosition}
+              onCancel={onCancelEdit}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Table container with modern border and subtle glow */}
       <div
