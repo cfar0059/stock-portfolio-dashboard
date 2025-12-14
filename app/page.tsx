@@ -153,7 +153,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#020817] text-slate-100 px-6 py-8">
+    <div className="min-h-screen text-slate-100 px-6 py-8">
       {/*<SummaryCards />*/}
 
       <PositionsSection
@@ -178,6 +178,6 @@ export default function HomePage() {
         onRefresh={() => setRefreshToken((prev) => prev + 1)}
         onToggleAdd={() => setIsAddOpen((prev) => !prev)}
       />
-    </main>
+    </div>
   );
 }
