@@ -18,6 +18,7 @@ export type Stock = {
   shares?: number;
   buyPrice?: number;
   profit?: number;
+  dca?: number; // Dollar Cost Averaging target price (optional)
 };
 
 type CacheEntry = {

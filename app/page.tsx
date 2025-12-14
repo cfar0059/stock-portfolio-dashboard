@@ -2,11 +2,10 @@
 // app/page.tsx
 "use client";
 
-import {useEffect, useState} from "react";
-import {Header} from "@/components/Header";
+import { useEffect, useState } from "react";
 // import { SummaryCards } from "@/components/SummaryCards";
-import {PositionsSection} from "@/components/PositionsSection";
-import {Position} from "@/lib/positions";
+import { PositionsSection } from "@/components/PositionsSection";
+import { Position } from "@/lib/positions";
 
 const POSITIONS_STORAGE_KEY = "portfolio-positions";
 
@@ -17,6 +16,7 @@ export default function HomePage() {
   const [newSymbol, setNewSymbol] = useState("");
   const [newShares, setNewShares] = useState("");
   const [newBuyPrice, setNewBuyPrice] = useState("");
+  const [newDca, setNewDca] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [editingPosition, setEditingPosition] = useState<Position | null>(null);
 
@@ -65,6 +65,7 @@ export default function HomePage() {
     const trimmedSymbol = newSymbol.trim().toUpperCase();
     const sharesNumber = Number(newShares);
     const buyPriceNumber = Number(newBuyPrice);
+    const dcaNumber = newDca ? Number(newDca) : undefined;
 
     if (!trimmedSymbol) {
       setFormError("Symbol is required.");
@@ -81,6 +82,14 @@ export default function HomePage() {
       return;
     }
 
+    if (
+      dcaNumber !== undefined &&
+      (!Number.isFinite(dcaNumber) || dcaNumber < 0)
+    ) {
+      setFormError("Target DCA must be a non-negative number.");
+      return;
+    }
+
     if (editingPosition) {
       // Update existing position
       setPositions((prev) =>
@@ -91,9 +100,10 @@ export default function HomePage() {
                 symbol: trimmedSymbol,
                 shares: sharesNumber,
                 buyPrice: buyPriceNumber,
+                dca: dcaNumber,
               }
-            : position
-        )
+            : position,
+        ),
       );
     } else {
       // Create new position
@@ -102,6 +112,7 @@ export default function HomePage() {
         symbol: trimmedSymbol,
         shares: sharesNumber,
         buyPrice: buyPriceNumber,
+        dca: dcaNumber,
       };
       setPositions((prev) => [...prev, newPosition]);
     }
@@ -110,6 +121,7 @@ export default function HomePage() {
     setNewSymbol("");
     setNewShares("");
     setNewBuyPrice("");
+    setNewDca("");
     setEditingPosition(null);
     setIsAddOpen(false);
     setRefreshToken((prev) => prev + 1);
@@ -120,6 +132,7 @@ export default function HomePage() {
     setNewSymbol(position.symbol);
     setNewShares(String(position.shares));
     setNewBuyPrice(String(position.buyPrice));
+    setNewDca(position.dca ? String(position.dca) : "");
     setIsAddOpen(true);
     setFormError(null);
   }
@@ -129,6 +142,7 @@ export default function HomePage() {
     setNewSymbol("");
     setNewShares("");
     setNewBuyPrice("");
+    setNewDca("");
     setFormError(null);
   }
 
@@ -140,12 +154,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#020817] text-slate-100 px-6 py-8">
-      <Header
-        isAddOpen={isAddOpen}
-        onRefresh={() => setRefreshToken((prev) => prev + 1)}
-        onToggleAdd={() => setIsAddOpen((prev) => !prev)}
-      />
-
       {/*<SummaryCards />*/}
 
       <PositionsSection
@@ -156,15 +164,19 @@ export default function HomePage() {
         newSymbol={newSymbol}
         newShares={newShares}
         newBuyPrice={newBuyPrice}
+        newDca={newDca}
         formError={formError}
         editingPosition={editingPosition}
         onSymbolChange={setNewSymbol}
         onSharesChange={setNewShares}
         onBuyPriceChange={setNewBuyPrice}
+        onDcaChange={setNewDca}
         onAddPosition={handleAddPosition}
         onEditPosition={handleEditPosition}
         onCancelEdit={handleCancelEdit}
         onRemovePosition={handleRemovePosition}
+        onRefresh={() => setRefreshToken((prev) => prev + 1)}
+        onToggleAdd={() => setIsAddOpen((prev) => !prev)}
       />
     </main>
   );

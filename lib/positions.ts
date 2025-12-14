@@ -3,4 +3,5 @@ export type Position = {
   symbol: string;
   shares: number;
   buyPrice: number;
+  dca?: number; // Dollar Cost Averaging target price (optional)
 };

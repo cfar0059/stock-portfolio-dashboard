@@ -1,16 +1,18 @@
 import React from "react";
-import {Button} from "@/components/ui/button";
-import {Check, X} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 
 interface AddPositionFormProps {
   newSymbol: string;
   newShares: string;
   newBuyPrice: string;
+  newDca: string;
   formError: string | null;
   isEditing?: boolean;
   onSymbolChange: (value: string) => void;
   onSharesChange: (value: string) => void;
   onBuyPriceChange: (value: string) => void;
+  onDcaChange: (value: string) => void;
   onSubmit: () => void;
   onCancel?: () => void;
 }
@@ -19,17 +21,19 @@ export function AddPositionForm({
   newSymbol,
   newShares,
   newBuyPrice,
+  newDca,
   formError,
   isEditing = false,
   onSymbolChange,
   onSharesChange,
   onBuyPriceChange,
+  onDcaChange,
   onSubmit,
   onCancel,
 }: Readonly<AddPositionFormProps>) {
   return (
     <div className="mb-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-      <div className="mb-3 grid gap-3 md:grid-cols-3">
+      <div className="mb-3 grid gap-3 md:grid-cols-4">
         <div>
           <label
             htmlFor="symbol"
@@ -63,21 +67,40 @@ export function AddPositionForm({
             className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-slate-400"
           />
         </div>
-        <div className="flex flex-col">
+        <div>
           <label
             htmlFor="buyPrice"
             className="mb-1 block text-xs font-medium text-slate-400"
           >
-            Buy price
+            Buy Price
+          </label>
+          <input
+            id="buyPrice"
+            type="number"
+            min="0"
+            step="0.01"
+            value={newBuyPrice}
+            onChange={(e) => onBuyPriceChange(e.target.value)}
+            placeholder="e.g. 120"
+            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-slate-400"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label
+            htmlFor="dca"
+            className="mb-1 block text-xs font-medium text-slate-400"
+          >
+            Target DCA
           </label>
           <div className="flex gap-2 items-end">
             <input
-              id="buyPrice"
+              id="dca"
               type="number"
               min="0"
-              value={newBuyPrice}
-              onChange={(e) => onBuyPriceChange(e.target.value)}
-              placeholder="e.g. 120"
+              step="0.01"
+              value={newDca}
+              onChange={(e) => onDcaChange(e.target.value)}
+              placeholder="e.g. 100"
               className="flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-slate-400"
             />
             <Button
