@@ -6,13 +6,14 @@ import { useEffect, useState } from "react";
 // import { SummaryCards } from "@/components/SummaryCards";
 import { PositionsSection } from "@/components/PositionsSection";
 import { Position } from "@/lib/positions";
+import { validatePosition } from "@/lib/validation";
 
 const POSITIONS_STORAGE_KEY = "portfolio-positions";
 
 export default function HomePage() {
   const [refreshToken, setRefreshToken] = useState(0);
   const [positions, setPositions] = useState<Position[]>([]);
-  const [isAddOpen, setIsAddOpen] = useState(true);
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const [newSymbol, setNewSymbol] = useState("");
   const [newShares, setNewShares] = useState("");
   const [newBuyPrice, setNewBuyPrice] = useState("");
@@ -62,33 +63,24 @@ export default function HomePage() {
 
   function handleAddPosition() {
     setFormError(null);
+
+    // Validate all fields at once
+    const validationError = validatePosition(
+      newSymbol,
+      newShares,
+      newBuyPrice,
+      newDca,
+    );
+    if (validationError) {
+      setFormError(validationError);
+      return;
+    }
+
+    // All validations passed, safe to convert to numbers
     const trimmedSymbol = newSymbol.trim().toUpperCase();
     const sharesNumber = Number(newShares);
     const buyPriceNumber = Number(newBuyPrice);
     const dcaNumber = newDca ? Number(newDca) : undefined;
-
-    if (!trimmedSymbol) {
-      setFormError("Symbol is required.");
-      return;
-    }
-
-    if (!Number.isFinite(sharesNumber) || sharesNumber < 0) {
-      setFormError("Shares must be a non-negative number.");
-      return;
-    }
-
-    if (!Number.isFinite(buyPriceNumber) || buyPriceNumber < 0) {
-      setFormError("Buy price must be a non-negative number.");
-      return;
-    }
-
-    if (
-      dcaNumber !== undefined &&
-      (!Number.isFinite(dcaNumber) || dcaNumber < 0)
-    ) {
-      setFormError("Target DCA must be a non-negative number.");
-      return;
-    }
 
     if (editingPosition) {
       // Update existing position

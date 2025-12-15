@@ -1,7 +1,6 @@
-export type Position = {
-  id: string; // uuid or simple timestamp string
-  symbol: string;
-  shares: number;
-  buyPrice: number;
-  dca?: number; // Dollar Cost Averaging target price (optional)
-};
+/**
+ * Position utilities and types
+ * Re-exports Position type from centralized types
+ */
+
+export type { Position } from "@/lib/types";

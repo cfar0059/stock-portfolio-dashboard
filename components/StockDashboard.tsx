@@ -17,69 +17,20 @@ import {
 import { SourceIndicator } from "@/components/SourceIndicator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { calculateProfit } from "@/lib/calculateProfit";
+import { formatCurrency } from "@/lib/formatting";
+import {
+  getProfitColor,
+  SORTABLE_HEAD_CLASS,
+  TABLE_HEAD_CLASS,
+} from "@/lib/styles";
+import {
+  isAtOrBelowDca,
+  mergePositionsWithStocks,
+  sortStocks,
+} from "@/lib/stockLogic";
 
 // Constants
-const TABLE_HEAD_CLASS =
-  "px-2 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-medium text-slate-400 font-semibold";
-const SORTABLE_HEAD_CLASS = `${TABLE_HEAD_CLASS} cursor-pointer hover:text-slate-300 transition-colors`;
-const formatCurrency = (value: number): string =>
-  value.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-
-const getProfitColor = (profit: number): string =>
-  profit >= 0 ? "text-emerald-400" : "text-red-400";
-
-const isAtOrBelowDca = (price: number, dca?: number): boolean =>
-  dca != null && dca > 0 && price <= dca;
-
-const mergePositionsWithStocks = (
-  stocks: Stock[],
-  positions: Position[],
-): Stock[] =>
-  stocks.map((stock) => {
-    const position = positions.find((p) => p.symbol === stock.symbol);
-    const shares = position?.shares || 0;
-    const buyPrice = position?.buyPrice || 0;
-    const dca = position?.dca;
-
-    let profit = 0;
-    if (buyPrice && shares > 0) {
-      const { amount } = calculateProfit(stock.price, buyPrice, shares);
-      profit = amount;
-    }
-
-    return {
-      ...stock,
-      shares,
-      buyPrice,
-      profit,
-      dca,
-    };
-  });
-
-const sortStocks = (
-  stocks: Stock[],
-  column: keyof Stock | null,
-  direction: "asc" | "desc",
-): Stock[] => {
-  if (!column) return stocks;
-
-  return [...stocks].sort((a, b) => {
-    const aValue = a[column];
-    const bValue = b[column];
-
-    if (typeof aValue === "number" && typeof bValue === "number") {
-      return direction === "asc" ? aValue - bValue : bValue - aValue;
-    }
-
-    const aStr = String(aValue).toLowerCase();
-    const bStr = String(bValue).toLowerCase();
-    const comparison = aStr.localeCompare(bStr);
-    return direction === "asc" ? comparison : -comparison;
-  });
-};
+// (mergePositionsWithStocks, sortStocks, isAtOrBelowDca imported from lib/stockLogic)
 
 interface StockDashboardProps {
   symbols: string[];
@@ -87,6 +38,7 @@ interface StockDashboardProps {
   refreshToken?: number;
   onEditPosition?: (position: Position) => void;
   onRemovePosition?: (symbol: string) => void;
+  onToggleAdd?: () => void;
 }
 
 // Profit Cell Component
@@ -167,6 +119,7 @@ export function StockDashboard({
   refreshToken,
   onEditPosition,
   onRemovePosition,
+  onToggleAdd,
 }: Readonly<StockDashboardProps>) {
   const [stocks, setStocks] = useState<StockResponse>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -239,28 +192,56 @@ export function StockDashboard({
   };
 
   if (loading) {
-    return <div>Loading stocks...</div>;
+    return <div suppressHydrationWarning>Loading stocks...</div>;
   }
 
   if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
+    return (
+      <div suppressHydrationWarning className="text-red-500">
+        Error: {error}
+      </div>
+    );
   }
 
   if (stocks.length === 0) {
     return (
-      <div className="text-slate-400">
-        No positions added yet. Click &quot;Add Position&quot; to get started.
+      <div suppressHydrationWarning className="py-16 px-6 text-center">
+        <div className="inline-block text-left max-w-xs">
+          <h3 className="text-lg font-semibold text-slate-100 mb-2">
+            No positions yet
+          </h3>
+          <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+            Your portfolio is empty. Begin by adding your first stock position
+            to start tracking your investments.
+          </p>
+          <Button
+            onClick={onToggleAdd}
+            variant="outline"
+            className="w-full border-slate-600 bg-slate-800/50 text-slate-200 hover:border-slate-500 hover:bg-slate-700 hover:text-slate-100"
+          >
+            Add Position
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <ScrollArea>
-      <Card className="bg-transparent border-0 text-slate-100">
+    <ScrollArea suppressHydrationWarning>
+      <Card
+        suppressHydrationWarning
+        className="bg-transparent border-0 text-slate-100"
+      >
         <CardContent className="px-0 py-0">
-          <Table className="w-full border-separate border-spacing-y-1">
+          <Table
+            suppressHydrationWarning
+            className="w-full border-separate border-spacing-y-1"
+          >
             <TableHeader>
-              <TableRow className="border-b border-slate-800 bg-slate-900 hover:bg-slate-900">
+              <TableRow
+                suppressHydrationWarning
+                className="border-b border-slate-800 bg-slate-900 hover:bg-slate-900"
+              >
                 <SortableHeader
                   label="Symbol"
                   column="symbol"
@@ -319,10 +300,13 @@ export function StockDashboard({
             <TableBody>
               {sortedStocks.map((stock: Stock) => {
                 const highlightRow = isAtOrBelowDca(stock.price, stock.dca);
+                // Use unique position ID for key, fallback to symbol if no position
+                const rowKey = stock.id || stock.symbol;
 
                 return (
                   <TableRow
-                    key={stock.symbol}
+                    suppressHydrationWarning
+                    key={rowKey}
                     className={`border-b last:border-b-0 hover:bg-slate-900/60 transition-colors ${
                       highlightRow
                         ? "border-sky-500/40 bg-slate-800/60"

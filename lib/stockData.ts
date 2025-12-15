@@ -1,37 +1,19 @@
-type FinnhubQuoteResponse = {
-  c: number; // current price
-  d: number; // change
-  dp: number; // percent change
-  h: number; // high of the day
-  l: number; // low of the day
-  o: number; // open price
-  pc: number; // previous close
-  t: number; // timestamp
-};
+import type {
+  CacheEntry,
+  FinnhubQuoteResponse,
+  Stock,
+  StockResponse,
+} from "@/lib/types";
 
-export type Stock = {
-  symbol: string;
-  price: number;
-  change: number;
-  currency: string;
-  source: "cache" | "live";
-  shares?: number;
-  buyPrice?: number;
-  profit?: number;
-  dca?: number; // Dollar Cost Averaging target price (optional)
-};
-
-type CacheEntry = {
-  data: Stock;
-  expiresAt: number;
-};
+// Re-export types for backwards compatibility
+export type { Stock, StockResponse };
 
 const stockCache = new Map<string, CacheEntry>();
 
 // TTL in milliseconds (e.g. 30 seconds)
 const STOCK_CACHE_TTL_MS = 30_000;
 
-export type StockResponse = Stock[];
+// ...existing code...
 
 export async function getStockData(symbols: string[]): Promise<StockResponse> {
   const results = await Promise.allSettled(

@@ -144,6 +144,7 @@ export function PositionsSection({
             refreshToken={refreshToken}
             onEditPosition={onEditPosition}
             onRemovePosition={onRemovePosition}
+            onToggleAdd={onToggleAdd}
           />
         </div>
       </div>
