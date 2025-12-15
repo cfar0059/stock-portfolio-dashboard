@@ -22,14 +22,29 @@ export const validateSymbol = (symbol: string): string | null => {
 
 /**
  * Validate shares quantity
+ * Accepts whole numbers and fractional shares up to 2 decimal places
  * @param shares - The shares value (will be converted to number)
  * @returns Error message if invalid, null if valid
  */
 export const validateShares = (shares: string): string | null => {
   const sharesNumber = Number(shares);
-  if (!Number.isFinite(sharesNumber) || sharesNumber < 0) {
-    return "Shares must be a non-negative number.";
+
+  // Check if it's a valid finite number
+  if (!Number.isFinite(sharesNumber)) {
+    return "Shares must be a number.";
   }
+
+  // Shares must be greater than 0
+  if (sharesNumber <= 0) {
+    return "Shares must be greater than 0.";
+  }
+
+  // Check precision: max 2 decimal places
+  const decimalPlaces = (shares.split(".")[1] || "").length;
+  if (decimalPlaces > 2) {
+    return "Shares can have at most 2 decimal places.";
+  }
+
   return null;
 };
 

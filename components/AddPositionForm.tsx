@@ -62,6 +62,7 @@ export function AddPositionForm({
               id="shares"
               type="number"
               min="0"
+              step="0.01"
               value={newShares}
               onChange={(e) => onSharesChange(e.target.value)}
               placeholder="e.g. 10"

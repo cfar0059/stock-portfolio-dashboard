@@ -32,7 +32,7 @@ export function Navbar() {
           href="/"
           className="text-lg font-semibold text-slate-100 hover:text-slate-50 transition-colors"
         >
-          SPD
+          JustDCA
         </Link>
 
         {/* Navigation Items - Right aligned */}

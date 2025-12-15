@@ -7,8 +7,10 @@ import { useEffect, useState } from "react";
 import { PositionsSection } from "@/components/PositionsSection";
 import { Position } from "@/lib/positions";
 import { validatePosition } from "@/lib/validation";
-
-const POSITIONS_STORAGE_KEY = "portfolio-positions";
+import {
+  getPositionsFromStorage,
+  savePositionsToStorage,
+} from "@/lib/storageUtils";
 
 export default function HomePage() {
   const [refreshToken, setRefreshToken] = useState(0);
@@ -20,42 +22,21 @@ export default function HomePage() {
   const [newDca, setNewDca] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [editingPosition, setEditingPosition] = useState<Position | null>(null);
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   // Load positions from localStorage on first mount
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const stored = window.localStorage.getItem(POSITIONS_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as Position[];
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPositions(parsed);
-      } else {
-        // Seed with a basic default portfolio for now
-        const defaultPositions: Position[] = [
-          { id: "AMD-0", symbol: "AMD", shares: 0, buyPrice: 0 },
-          { id: "GOOGL-0", symbol: "GOOGL", shares: 0, buyPrice: 0 },
-          { id: "MSFT-0", symbol: "MSFT", shares: 0, buyPrice: 0 },
-        ];
-        setPositions(defaultPositions);
-      }
-    } catch (error) {
-      console.error("Failed to load positions from localStorage", error);
-    }
+    const stored = getPositionsFromStorage();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPositions(stored);
+    setHasHydrated(true);
   }, []);
 
-  // Persist positions to localStorage when they change
+  // Persist positions to localStorage when they change (but only after hydration)
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(
-        POSITIONS_STORAGE_KEY,
-        JSON.stringify(positions),
-      );
-    } catch (error) {
-      console.error("Failed to save positions to localStorage", error);
-    }
-  }, [positions]);
+    if (!hasHydrated) return;
+    savePositionsToStorage(positions);
+  }, [positions, hasHydrated]);
 
   const symbols = Array.from(
     new Set(positions.map((p) => p.symbol.toUpperCase())),
@@ -145,7 +126,10 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen text-slate-100 px-6 py-8">
+    <div
+      suppressHydrationWarning
+      className="min-h-screen text-slate-100 px-6 py-8"
+    >
       {/*<SummaryCards />*/}
 
       <PositionsSection
