@@ -24,10 +24,13 @@ import {
   TABLE_HEAD_CLASS,
 } from "@/lib/styles";
 import {
-  isAtOrBelowDca,
+  getRowStyles,
   mergePositionsWithStocks,
   sortStocks,
 } from "@/lib/stockLogic";
+
+// Debug flag - set to true to log DCA styling decisions
+const DEBUG_ROW_STYLES = false;
 
 // Constants
 // (mergePositionsWithStocks, sortStocks, isAtOrBelowDca imported from lib/stockLogic)
@@ -299,7 +302,17 @@ export function StockDashboard({
             </TableHeader>
             <TableBody>
               {sortedStocks.map((stock: Stock) => {
-                const highlightRow = isAtOrBelowDca(stock.price, stock.dca);
+                // Get all styling decisions from centralized helper
+                const { rowClass, priceTextClass, dcaTextClass, highlightRow } =
+                  getRowStyles(stock);
+
+                // Debug: Log DCA styling decision per row
+                if (DEBUG_ROW_STYLES) {
+                  console.log(
+                    `[DCA-DEBUG] ${stock.symbol}: price=${stock.price} dca=${stock.dca ?? "null"} highlight=${highlightRow}`,
+                  );
+                }
+
                 // Use unique position ID for key, fallback to symbol if no position
                 const rowKey = stock.id || stock.symbol;
 
@@ -307,20 +320,14 @@ export function StockDashboard({
                   <TableRow
                     suppressHydrationWarning
                     key={rowKey}
-                    className={`border-b last:border-b-0 hover:bg-slate-900/60 transition-colors ${
-                      highlightRow
-                        ? "border-sky-500/40 bg-slate-800/60"
-                        : "border-slate-800"
-                    }`}
+                    className={rowClass}
                   >
                     <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 font-medium text-slate-200 text-xs sm:text-sm whitespace-nowrap min-w-[90px] border-r border-slate-700/50">
                       <SourceIndicator source={stock.source} />
                       {stock.symbol}
                     </TableCell>
                     <TableCell
-                      className={`px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-right whitespace-nowrap min-w-[90px] ${
-                        highlightRow ? "text-sky-400" : "text-slate-200"
-                      }`}
+                      className={`px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-right whitespace-nowrap min-w-[90px] ${priceTextClass}`}
                     >
                       {stock.price.toFixed(2)}{" "}
                       <span className="text-[10px] sm:text-xs text-slate-400">
@@ -348,7 +355,9 @@ export function StockDashboard({
                     <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-right min-w-[110px]">
                       <ProfitCell stock={stock} />
                     </TableCell>
-                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-200 text-right min-w-[90px]">
+                    <TableCell
+                      className={`px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-right min-w-[90px] ${dcaTextClass}`}
+                    >
                       {stock.dca ? `${stock.dca.toFixed(2)}` : "—"}{" "}
                       {stock.dca && (
                         <span className="text-[10px] sm:text-xs text-slate-400">

@@ -30,9 +30,10 @@ export function Navbar() {
         {/* Logo / Branding - Clickable link to homepage */}
         <Link
           href="/"
-          className="text-lg font-semibold text-slate-100 hover:text-slate-50 transition-colors"
+          className="flex items-center hover:opacity-80 transition-opacity"
         >
-          JustDCA
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="JustDCA Logo" className="h-8 w-auto" />
         </Link>
 
         {/* Navigation Items - Right aligned */}
