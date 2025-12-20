@@ -128,6 +128,24 @@ npm run typecheck
 npm run lint
 ```
 
+### Continuous Integration
+
+This project uses GitHub Actions for automated testing and validation.
+
+**CI Pipeline runs on:**
+- Every push to `main` branch
+- Every pull request to `main` branch
+
+**CI Steps:**
+1. Install dependencies (`npm ci`)
+2. Run ESLint (`npm run lint`)
+3. Type check TypeScript (`npm run typecheck`)
+4. Build production bundle (`npm run build`)
+
+**Node.js versions tested:** 18.x, 20.x
+
+All steps must pass before code can be merged. The CI workflow is defined in `.github/workflows/ci.yml`.
+
 ### Project Structure
 
 ```
