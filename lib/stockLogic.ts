@@ -94,7 +94,11 @@ export const isAtOrBelowDca = (price: number, dcaTarget?: number): boolean => {
   if (!dcaTarget || dcaTarget <= 0) {
     return false;
   }
-  // Highlight if price is within ±5% of DCA target
+  // Always highlight if price is at or below DCA target (definitive buy signal)
+  if (price <= dcaTarget) {
+    return true;
+  }
+  // Above DCA: highlight only if within proximity threshold (±5%)
   const lowerBound = dcaTarget * 0.95;
   const upperBound = dcaTarget * 1.05;
   return price >= lowerBound && price <= upperBound;
@@ -108,17 +112,19 @@ export const isAtOrBelowDca = (price: number, dcaTarget?: number): boolean => {
  * @returns Object with CSS class strings for row and price text highlight
  *
  * STYLING RULES:
- * - Row highlight: Applied if price is within ±5% of DCA target
- * - Price text emphasis: Applied if price is within ±5% of DCA target (sky-blue highlight)
+ * - Row highlight: Always applied when price <= DCA target (definitive buy signal)
+ *                  When price > DCA, applied only if within +5% proximity threshold
+ * - Price text emphasis: Applied when row is highlighted (sky-blue)
  * - Entire row highlight: Applied with sky-blue border + background
- * - Call-to-action signal: User's DCA target is in reach, take action now
+ * - Call-to-action signal: Price at/below DCA = take action; slightly above = proximity alert
  * - Only highlights if DCA target is explicitly set by user
  * - All inputs MUST be numbers; formatting happens only at render time
  *
  * EXPECTED INVARIANTS:
- * - If DCA target is set AND price within ±5%: Row + Price cell will have highlight styling (sky-blue)
+ * - If DCA target is set AND price <= DCA: Always highlighted (definitive buy opportunity)
+ * - If DCA target is set AND price > DCA but within +5%: Highlighted (proximity alert)
  * - If DCA target is null/undefined: No highlight (user hasn't set a target)
- * - If price is outside ±5% range: No highlight (target not in reach yet)
+ * - If price is > DCA + 5%: No highlight (target not in reach)
  * - Base profitability colors (green/red) are separate from DCA emphasis
  */
 export const getRowStyles = (stock: Stock) => {
