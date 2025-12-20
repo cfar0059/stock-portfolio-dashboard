@@ -6,7 +6,12 @@ interface HeaderProps {
   onToggleAdd: () => void;
 }
 
-export function Header({ isAddOpen, onRefresh, onToggleAdd }: HeaderProps) {
+export function Header({
+  isAddOpen,
+  onRefresh,
+  onToggleAdd,
+  breakTS,
+}: HeaderProps) {
   return (
     <div className="flex items-center justify-between mb-8">
       <div>
