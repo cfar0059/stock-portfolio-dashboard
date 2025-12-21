@@ -182,7 +182,6 @@ export default function ProfilePage() {
   // Load positions from localStorage and fetch stock data
   useEffect(() => {
     const stored = getPositionsFromStorage();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPositions(stored);
 
     // Fetch stock data for all positions with shares > 0

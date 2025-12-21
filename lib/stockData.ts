@@ -92,7 +92,9 @@ export async function fetchStockFromAPI(symbol: string): Promise<Stock> {
   }
 }
 
-export default {
+const stockDataModule = {
   getStockData,
   fetchStockFromAPI,
 };
+
+export default stockDataModule;
