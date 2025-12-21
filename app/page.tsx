@@ -27,7 +27,6 @@ export default function HomePage() {
   // Load positions from localStorage on first mount
   useEffect(() => {
     const stored = getPositionsFromStorage();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPositions(stored);
     setHasHydrated(true);
   }, []);

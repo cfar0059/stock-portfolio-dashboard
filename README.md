@@ -1,6 +1,6 @@
 # Stock Portfolio Dashboard
 
-A modern, responsive stock portfolio management application built with **Next.js 16.1.1**, **React 19**, **TypeScript**, **Tailwind CSS v4**, and **shadcn/ui**.
+A modern, responsive stock portfolio management application built with **Next.js 15.5.9**, **React 19**, **TypeScript**, **Tailwind CSS v4**, and **shadcn/ui**.
 
 Track your stock positions, monitor performance metrics, and optimize your Dollar Cost Averaging (DCA) strategy in a sleek, dark-themed dashboard.
 
@@ -179,7 +179,7 @@ stock-portfolio-dashboard/
 
 | Layer | Technology |
 |-------|-----------|
-| **Framework** | Next.js 16.1.1 (App Router) |
+| **Framework** | Next.js 15.5.9 (App Router) |
 | **Runtime** | React 19 |
 | **Language** | TypeScript 5 |
 | **Styling** | Tailwind CSS v4 |
