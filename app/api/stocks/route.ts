@@ -20,10 +20,16 @@ function isValidSymbol(symbol: string): boolean {
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+  console.log("[API /api/stocks] Request received");
+  console.log("[API /api/stocks] Full URL:", req.url);
+
   const { searchParams } = new URL(req.url);
   const symbolsParam = searchParams.get("symbols");
 
+  console.log("[API /api/stocks] symbolsParam:", symbolsParam);
+
   if (!symbolsParam) {
+    console.log("[API /api/stocks] ERROR: Missing symbols param");
     return NextResponse.json(
       { error: 'Missing "symbols" query parameter. Use ?symbols=AAPL,MSFT' },
       { status: 400 },
@@ -36,8 +42,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     .map((s) => s.trim().toUpperCase())
     .filter(Boolean);
 
+  console.log("[API /api/stocks] rawSymbols:", rawSymbols);
+
   // Security: Limit number of symbols per request
   if (rawSymbols.length > MAX_SYMBOLS_PER_REQUEST) {
+    console.log("[API /api/stocks] ERROR: Too many symbols");
     return NextResponse.json(
       {
         error: `Too many symbols. Maximum ${MAX_SYMBOLS_PER_REQUEST} allowed.`,
@@ -49,7 +58,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   // Security: Validate each symbol format
   const symbols = rawSymbols.filter(isValidSymbol);
 
+  console.log("[API /api/stocks] Validated symbols:", symbols);
+
   if (symbols.length === 0) {
+    console.log("[API /api/stocks] ERROR: No valid symbols after validation");
     return NextResponse.json(
       {
         error:
@@ -60,11 +72,21 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 
   try {
+    console.log("[API /api/stocks] Calling getStockData with:", symbols);
     const data: StockResponse = await getStockData(symbols);
+    console.log(
+      "[API /api/stocks] getStockData returned:",
+      JSON.stringify(data),
+    );
+    console.log("[API /api/stocks] Number of stocks returned:", data.length);
 
     return NextResponse.json({ stocks: data }, { status: 200 });
   } catch (error) {
-    console.error("Error in GET /api/stocks", error);
+    console.error("[API /api/stocks] ERROR in getStockData:", error);
+    console.error(
+      "[API /api/stocks] Error message:",
+      error instanceof Error ? error.message : String(error),
+    );
     return NextResponse.json(
       { error: "Failed to fetch stock data." },
       { status: 500 },
