@@ -4,6 +4,7 @@ import type {
   Stock,
   StockResponse,
 } from "@/lib/types";
+import { getFinnhubApiKey } from "@/lib/env";
 
 // Re-export types for backwards compatibility
 export type { Stock, StockResponse };
@@ -53,16 +54,22 @@ export async function getStockData(symbols: string[]): Promise<StockResponse> {
 
 export async function fetchStockFromAPI(symbol: string): Promise<Stock> {
   const normalizedSymbol = symbol.toUpperCase();
-  const apiKey = process.env.FINNHUB_API_KEY;
 
   console.log(`[fetchStockFromAPI] Symbol: ${normalizedSymbol}`);
-  console.log(
-    `[fetchStockFromAPI] FINNHUB_API_KEY present: ${apiKey ? "YES (length: " + apiKey.length + ")" : "NO"}`,
-  );
 
-  if (!apiKey) {
-    console.error("[fetchStockFromAPI] ERROR: FINNHUB_API_KEY is not set");
-    throw new Error("FINNHUB_API_KEY is not set in environment variables.");
+  // Use centralized env getter with Amplify SSR support
+  let apiKey: string;
+  try {
+    apiKey = getFinnhubApiKey();
+    console.log(
+      `[fetchStockFromAPI] FINNHUB_API_KEY present: YES (length: ${apiKey.length})`,
+    );
+  } catch (error) {
+    console.error(
+      `[fetchStockFromAPI] FINNHUB_API_KEY not found:`,
+      error instanceof Error ? error.message : error,
+    );
+    throw error;
   }
 
   // 1. Try cache first
