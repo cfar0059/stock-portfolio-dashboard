@@ -71,6 +71,7 @@ export function PositionsSection({
             onClick={onToggleAdd}
             className="border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-500 hover:bg-slate-700 hover:text-slate-100 hover:cursor-pointer"
             aria-label={isAddOpen ? "Close form" : "Add position"}
+            data-testid="add-position-toggle"
           >
             <Plus className="h-4 w-4 mr-1" />
             {isAddOpen ? "Close" : "Add"}

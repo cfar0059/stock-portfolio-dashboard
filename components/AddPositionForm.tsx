@@ -52,6 +52,7 @@ export function AddPositionForm({
               placeholder="e.g. AMD"
               disabled={isEditing}
               className={`${INPUT_CLASS} ${INPUT_DISABLED_CLASS}`}
+              data-testid="input-symbol"
             />
           </div>
           <div>
@@ -67,6 +68,7 @@ export function AddPositionForm({
               onChange={(e) => onSharesChange(e.target.value)}
               placeholder="e.g. 10"
               className={INPUT_CLASS}
+              data-testid="input-shares"
             />
           </div>
           <div>
@@ -82,6 +84,7 @@ export function AddPositionForm({
               onChange={(e) => onBuyPriceChange(e.target.value)}
               placeholder="e.g. 120"
               className={INPUT_CLASS}
+              data-testid="input-buy-price"
             />
           </div>
           <div className="flex flex-col">
@@ -98,6 +101,7 @@ export function AddPositionForm({
                 onChange={(e) => onDcaChange(e.target.value)}
                 placeholder="e.g. 100"
                 className={INPUT_CLASS}
+                data-testid="input-dca"
               />
               <Button
                 type="submit"
@@ -105,6 +109,7 @@ export function AddPositionForm({
                 size="icon"
                 className="hover:bg-emerald-500/20"
                 aria-label="Save Position"
+                data-testid="save-position-button"
               >
                 <Check className="h-4 w-4 text-emerald-500" />
               </Button>

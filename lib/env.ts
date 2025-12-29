@@ -28,24 +28,8 @@ function getEnvValue(name: string): string | undefined {
   const value = process.env[name];
 
   if (value) {
-    console.log(`[env] Found ${name} via process.env`);
     return value;
   }
-
-  // Debug: Log all available env keys (masked) to help diagnose Amplify issues
-  // This runs only when the primary lookup fails
-  console.log(`[env] ${name} not found in process.env`);
-  console.log(
-    `[env] Available env keys:`,
-    Object.keys(process.env).filter(
-      (k) =>
-        k.includes("FINNHUB") ||
-        k.includes("API") ||
-        k.includes("SECRET") ||
-        k.includes("AWS") ||
-        k.includes("AMPLIFY"),
-    ),
-  );
 
   return undefined;
 }
