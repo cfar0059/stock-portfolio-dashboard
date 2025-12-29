@@ -29,9 +29,6 @@ import {
   sortStocks,
 } from "@/lib/stockLogic";
 
-// Debug flag - set to true to log DCA styling decisions
-const DEBUG_ROW_STYLES = false;
-
 // Constants
 // (mergePositionsWithStocks, sortStocks, isAtOrBelowDca imported from lib/stockLogic)
 
@@ -306,13 +303,6 @@ export function StockDashboard({
                 const { rowClass, priceTextClass, dcaTextClass, highlightRow } =
                   getRowStyles(stock);
 
-                // Debug: Log DCA styling decision per row
-                if (DEBUG_ROW_STYLES) {
-                  console.log(
-                    `[DCA-DEBUG] ${stock.symbol}: price=${stock.price} dca=${stock.dca ?? "null"} highlight=${highlightRow}`,
-                  );
-                }
-
                 // Use unique position ID for key, fallback to symbol if no position
                 const rowKey = stock.id || stock.symbol;
 
@@ -321,6 +311,8 @@ export function StockDashboard({
                     suppressHydrationWarning
                     key={rowKey}
                     className={rowClass}
+                    data-testid={`position-row-${stock.symbol}`}
+                    data-dca-highlighted={highlightRow.toString()}
                   >
                     <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 font-medium text-slate-200 text-xs sm:text-sm whitespace-nowrap min-w-[90px] border-r border-slate-700/50">
                       <SourceIndicator source={stock.source} />
