@@ -7,10 +7,7 @@ import { useEffect, useState } from "react";
 import { PositionsSection } from "@/components/PositionsSection";
 import { Position } from "@/lib/positions";
 import { validatePosition } from "@/lib/validation";
-import {
-  getPositionsFromStorage,
-  savePositionsToStorage,
-} from "@/lib/storageUtils";
+import { localStoragePortfolioRepository } from "@/lib/portfolio/localStorageRepository";
 
 export default function HomePage() {
   const [refreshToken, setRefreshToken] = useState(0);
@@ -26,7 +23,7 @@ export default function HomePage() {
 
   // Load positions from localStorage on first mount
   useEffect(() => {
-    const stored = getPositionsFromStorage();
+    const stored = localStoragePortfolioRepository.getPositions();
     setPositions(stored);
     setHasHydrated(true);
   }, []);
@@ -34,7 +31,7 @@ export default function HomePage() {
   // Persist positions to localStorage when they change (but only after hydration)
   useEffect(() => {
     if (!hasHydrated) return;
-    savePositionsToStorage(positions);
+    localStoragePortfolioRepository.savePositions(positions);
   }, [positions, hasHydrated]);
 
   const symbols = Array.from(
