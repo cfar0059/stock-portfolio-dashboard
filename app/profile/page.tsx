@@ -19,7 +19,7 @@ import {
   getMetricColor,
 } from "@/lib/portfolioMetrics";
 import { formatCurrency, formatPercentage } from "@/lib/formatting";
-import { getPositionsFromStorage } from "@/lib/storageUtils";
+import { localStoragePortfolioRepository } from "@/lib/portfolio/localStorageRepository";
 
 interface KPICardProps {
   label: string;
@@ -181,7 +181,7 @@ export default function ProfilePage() {
 
   // Load positions from localStorage and fetch stock data
   useEffect(() => {
-    const stored = getPositionsFromStorage();
+    const stored = localStoragePortfolioRepository.getPositions();
     setPositions(stored);
 
     // Fetch stock data for all positions with shares > 0
