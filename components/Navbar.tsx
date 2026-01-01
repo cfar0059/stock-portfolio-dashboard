@@ -10,7 +10,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: "overview", label: "Overview", href: "/" },
+  { id: "overview", label: "Overview", href: "/overview" },
   { id: "profile", label: "Profile", href: "/profile" },
 ];
 
@@ -18,10 +18,7 @@ export function Navbar() {
   const pathname = usePathname();
 
   const isActive = (href: string): boolean => {
-    if (href === "/") {
-      return pathname === "/" || pathname === "/dashboard";
-    }
-    return pathname.startsWith(href);
+    return pathname === href || pathname.startsWith(`${href}/`);
   };
 
   return (
@@ -29,7 +26,7 @@ export function Navbar() {
       <div className="px-6 py-4 flex items-center justify-between">
         {/* Logo / Branding - Clickable link to homepage */}
         <Link
-          href="/"
+          href="/overview"
           className="flex items-center hover:opacity-80 transition-opacity"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

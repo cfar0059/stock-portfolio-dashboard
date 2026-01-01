@@ -45,7 +45,7 @@ async function mockStockPrices(page: Page, priceMap: Record<string, number>) {
  * Clear localStorage before each test to ensure clean state
  */
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/overview");
   await page.evaluate(() => localStorage.clear());
 });
 
@@ -55,7 +55,7 @@ test("Persistence (localStorage): Add position, verify, reload, and verify persi
   // Mock stock prices for AAPL
   await mockStockPrices(page, { AAPL: 150 });
 
-  await page.goto("/");
+  await page.goto("/overview");
 
   // Wait for page to hydrate - look for the Positions heading
   await page.waitForSelector("text=Positions", { timeout: 10000 });
@@ -123,7 +123,7 @@ test("DCA Highlighting: Verify highlight toggles based on price vs DCA target", 
   page,
 }) => {
   // Pre-seed localStorage with a position that has DCA target
-  await page.goto("/");
+  await page.goto("/overview");
   await page.evaluate(
     ({ key, data }) => {
       localStorage.setItem(key, JSON.stringify(data));

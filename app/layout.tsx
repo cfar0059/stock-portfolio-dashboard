@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Navbar } from "@/components/Navbar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { AppHeader } from "@/components/AppHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,8 +33,9 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#020817]`}
       >
-        <Navbar />
-        <main className="pt-16">{children}</main>
+        <AppSidebar />
+        <AppHeader />
+        <main className="lg:ml-64 pt-14 lg:pt-0">{children}</main>
       </body>
     </html>
   );
