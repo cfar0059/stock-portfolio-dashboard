@@ -1,24 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import {
+  Bell,
+  LayoutDashboard,
+  List,
+  Menu,
+  Settings,
+  TrendingUp,
+  User,
+  User as UserIcon,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface NavItem {
   id: string;
   label: string;
   href: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 const navItems: NavItem[] = [
-  { id: "overview", label: "Overview", href: "/overview" },
-  { id: "positions", label: "Positions", href: "/positions" },
-  { id: "benchmarks", label: "Benchmarks", href: "/benchmarks" },
-  { id: "alerts", label: "Alerts", href: "/alerts" },
-  { id: "profile", label: "Profile", href: "/profile" },
+  {
+    id: "overview",
+    label: "Overview",
+    href: "/overview",
+    icon: LayoutDashboard,
+  },
+  { id: "positions", label: "Positions", href: "/positions", icon: List },
+  {
+    id: "benchmarks",
+    label: "Benchmarks",
+    href: "/benchmarks",
+    icon: TrendingUp,
+  },
+  { id: "alerts", label: "Alerts", href: "/alerts", icon: Bell },
+  { id: "profile", label: "Profile", href: "/profile", icon: UserIcon },
 ];
+
+// Route to page title mapping
+const pageTitles: Record<string, string> = {
+  "/overview": "Overview",
+  "/positions": "Positions",
+  "/benchmarks": "Benchmarks",
+  "/alerts": "Alerts",
+  "/profile": "Profile",
+};
+
+// Fixed header height for consistent spacing
+const HEADER_HEIGHT = "h-14";
 
 export function AppHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,57 +61,145 @@ export function AppHeader() {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  const pageTitle = pageTitles[pathname] || "Dashboard";
+
+  // Close menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
+  // Close on ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [mobileMenuOpen]);
+
   return (
-    <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-slate-950 border-b border-slate-800">
-      <div className="px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
-        <Link
-          href="/overview"
-          className="flex items-center hover:opacity-80 transition-opacity"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="JustDCA Logo" className="h-7 w-auto" />
-        </Link>
+    <>
+      {/* Fixed Header */}
+      <header
+        className={`lg:hidden fixed top-0 left-0 right-0 z-50 ${HEADER_HEIGHT} bg-card border-b border-border flex items-center justify-between px-4`}
+      >
+        {/* Left: Hamburger + Page Title */}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <h1 className="text-sm font-medium text-foreground">{pageTitle}</h1>
+        </div>
 
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="text-slate-400 hover:text-slate-100"
-        >
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </Button>
-      </div>
+        {/* Right: Settings + Profile */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
+            aria-label="Settings"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
+            aria-label="Profile"
+          >
+            <User className="w-4 h-4" />
+          </Button>
+        </div>
+      </header>
 
-      {/* Mobile Navigation Dropdown */}
+      {/* Mobile Navigation Overlay + Drawer */}
       {mobileMenuOpen && (
-        <nav className="border-t border-slate-800 bg-slate-950">
-          <div className="px-4 py-2 space-y-1">
-            {navItems.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
-                    active
-                      ? "bg-slate-800 text-slate-100 font-medium"
-                      : "text-slate-400 hover:text-slate-100 hover:bg-slate-900"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
+        <>
+          {/* Backdrop overlay */}
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Navigation drawer */}
+          <nav
+            className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-[80vw] max-w-sm bg-card border-r border-border shadow-2xl"
+            aria-label="Mobile navigation"
+          >
+            {/* Drawer Header with Brand + Close */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <Link
+                href="/overview"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center hover:opacity-80 transition-opacity"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png"
+                  alt="JustDCA Logo"
+                  className="h-8 w-auto"
+                />
+              </Link>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Navigation Items */}
+            <nav className="py-4 px-3">
+              <div className="space-y-1">
+                {navItems.map((item) => {
+                  const active = isActive(item.href);
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                        active
+                          ? "bg-accent text-accent-foreground font-medium"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </nav>
+          </nav>
+        </>
       )}
-    </header>
+    </>
   );
 }

@@ -122,7 +122,7 @@ export default function OverviewPage() {
   return (
     <div
       suppressHydrationWarning
-      className="min-h-screen text-slate-100 px-6 py-8"
+      className="min-h-screen text-foreground px-6 py-8"
     >
       <PositionsSection
         isAddOpen={isAddOpen}

@@ -54,26 +54,24 @@ export function PositionsSection({
     <section className="space-y-4">
       {/* Header with title and action buttons */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-100">Positions</h2>
+        <h2 className="text-xl font-semibold text-foreground">Positions</h2>
         <div className="flex gap-2">
           <Button
-            variant="outline"
-            size="sm"
+            variant="ghost"
+            size="icon"
             onClick={onRefresh}
-            className="border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-500 hover:bg-slate-700 hover:text-slate-100 hover:cursor-pointer"
             aria-label="Refresh positions"
           >
-            <RotateCcw className="h-4 w-4" />
+            <RotateCcw className="w-4 h-4" />
           </Button>
           <Button
-            variant="outline"
             size="sm"
             onClick={onToggleAdd}
-            className="border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-500 hover:bg-slate-700 hover:text-slate-100 hover:cursor-pointer"
             aria-label={isAddOpen ? "Close form" : "Add position"}
             data-testid="add-position-toggle"
+            className="gap-2"
           >
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="w-4 h-4" />
             {isAddOpen ? "Close" : "Add"}
           </Button>
         </div>
@@ -120,34 +118,16 @@ export function PositionsSection({
         </div>
       </div>
 
-      {/* Table container with modern border and subtle glow */}
-      <div
-        className="relative rounded-lg border border-slate-700 bg-slate-900/30 overflow-hidden shadow-lg"
-        style={{
-          boxShadow: `
-               0 0 20px rgba(148, 163, 184, 0.05),
-               inset 0 1px 0 rgba(148, 163, 184, 0.1),
-               0 0 0 1px rgba(148, 163, 184, 0.05)
-             `,
-        }}
-      >
-        {/* Subtle glow overlay for top-left corner */}
-        <div className="absolute top-0 left-0 w-40 h-40 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Subtle glow overlay for bottom-right corner */}
-        <div className="absolute bottom-0 right-0 w-40 h-40 bg-slate-400/5 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Table content */}
-        <div className="relative z-10">
-          <StockDashboard
-            symbols={symbols}
-            positions={positions}
-            refreshToken={refreshToken}
-            onEditPosition={onEditPosition}
-            onRemovePosition={onRemovePosition}
-            onToggleAdd={onToggleAdd}
-          />
-        </div>
+      {/* Table container with modern border */}
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <StockDashboard
+          symbols={symbols}
+          positions={positions}
+          refreshToken={refreshToken}
+          onEditPosition={onEditPosition}
+          onRemovePosition={onRemovePosition}
+          onToggleAdd={onToggleAdd}
+        />
       </div>
     </section>
   );

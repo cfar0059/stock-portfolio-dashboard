@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { calculatePortfolioMetrics, getMetricColor } from "@/lib/portfolioMetrics";
+import {
+  calculatePortfolioMetrics,
+  getMetricColor,
+} from "@/lib/portfolioMetrics";
 import type { Position, Stock } from "@/lib/types";
 
 describe("calculatePortfolioMetrics", () => {
@@ -401,40 +404,40 @@ describe("calculatePortfolioMetrics", () => {
 
 describe("getMetricColor", () => {
   describe("positive values", () => {
-    it("should return emerald color for positive value", () => {
-      expect(getMetricColor(100)).toBe("text-emerald-400");
+    it("should return primary color for positive value", () => {
+      expect(getMetricColor(100)).toBe("text-primary");
     });
 
-    it("should return emerald color for very small positive value", () => {
-      expect(getMetricColor(0.01)).toBe("text-emerald-400");
+    it("should return primary color for very small positive value", () => {
+      expect(getMetricColor(0.01)).toBe("text-primary");
     });
 
-    it("should return emerald color for large positive value", () => {
-      expect(getMetricColor(999999)).toBe("text-emerald-400");
+    it("should return primary color for large positive value", () => {
+      expect(getMetricColor(999999)).toBe("text-primary");
     });
   });
 
   describe("negative values", () => {
-    it("should return red color for negative value", () => {
-      expect(getMetricColor(-100)).toBe("text-red-400");
+    it("should return destructive color for negative value", () => {
+      expect(getMetricColor(-100)).toBe("text-destructive");
     });
 
-    it("should return red color for very small negative value", () => {
-      expect(getMetricColor(-0.01)).toBe("text-red-400");
+    it("should return destructive color for very small negative value", () => {
+      expect(getMetricColor(-0.01)).toBe("text-destructive");
     });
 
-    it("should return red color for large negative value", () => {
-      expect(getMetricColor(-999999)).toBe("text-red-400");
+    it("should return destructive color for large negative value", () => {
+      expect(getMetricColor(-999999)).toBe("text-destructive");
     });
   });
 
   describe("zero value", () => {
-    it("should return slate color for exactly zero", () => {
-      expect(getMetricColor(0)).toBe("text-slate-200");
+    it("should return muted-foreground color for exactly zero", () => {
+      expect(getMetricColor(0)).toBe("text-muted-foreground");
     });
 
-    it("should return slate color for negative zero", () => {
-      expect(getMetricColor(-0)).toBe("text-slate-200");
+    it("should return muted-foreground color for negative zero", () => {
+      expect(getMetricColor(-0)).toBe("text-muted-foreground");
     });
   });
 });

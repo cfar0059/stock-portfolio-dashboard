@@ -22,7 +22,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950 border-b border-slate-800">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-sidebar-background border-b border-sidebar-border">
       <div className="px-6 py-4 flex items-center justify-between">
         {/* Logo / Branding - Clickable link to homepage */}
         <Link
@@ -44,8 +44,8 @@ export function Navbar() {
                 suppressHydrationWarning
                 className={`text-sm transition-colors ${
                   active
-                    ? "text-slate-100 font-bold"
-                    : "text-slate-400 hover:text-slate-300"
+                    ? "text-foreground font-bold"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {item.label}

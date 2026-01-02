@@ -19,11 +19,6 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { calculateProfit } from "@/lib/calculateProfit";
 import { formatCurrency } from "@/lib/formatting";
 import {
-  getProfitColor,
-  SORTABLE_HEAD_CLASS,
-  TABLE_HEAD_CLASS,
-} from "@/lib/styles";
-import {
   getRowStyles,
   mergePositionsWithStocks,
   sortStocks,
@@ -48,7 +43,7 @@ interface ProfitCellProps {
 
 function ProfitCell({ stock }: Readonly<ProfitCellProps>) {
   if (!stock.buyPrice || !stock.shares || stock.shares <= 0) {
-    return <span className="text-slate-400 text-xs sm:text-sm">-</span>;
+    return <span className="text-muted-foreground text-xs sm:text-sm">-</span>;
   }
 
   const { amount, percentage } = calculateProfit(
@@ -56,14 +51,16 @@ function ProfitCell({ stock }: Readonly<ProfitCellProps>) {
     stock.buyPrice || 0,
     stock.shares || 0,
   );
-  const textColor = getProfitColor(amount);
+
+  // Use token-based colors via CSS classes
+  const colorClass = amount >= 0 ? "text-primary" : "text-destructive";
 
   return (
     <div
-      className={`${textColor} flex flex-col text-right text-xs sm:text-sm leading-relaxed`}
+      className={`flex flex-col text-right text-xs sm:text-sm leading-relaxed ${colorClass}`}
     >
       <span className="font-medium">${formatCurrency(amount)}</span>
-      <span className="text-[10px] sm:text-xs opacity-90">
+      <span className="text-xs text-muted-foreground">
         ({percentage.toFixed(2)}%)
       </span>
     </div>
@@ -100,13 +97,13 @@ function SortableHeader({
 
   return (
     <TableHead
-      className={`${SORTABLE_HEAD_CLASS} ${isNumeric ? "text-right" : ""} ${
-        hasSeparator ? "border-r border-slate-700/50" : ""
-      }`}
+      className={`h-12 px-4 text-left align-middle cursor-pointer hover:bg-accent/50 transition-colors ${
+        isNumeric ? "text-right" : ""
+      } ${hasSeparator ? "border-r border-border/50" : ""}`}
       onClick={() => onSort(column)}
     >
       {label}{" "}
-      <span className={isActive ? "text-slate-200" : "text-slate-500"}>
+      <span className={isActive ? "text-primary" : "opacity-50"}>
         {getSortIndicator(column)}
       </span>
     </TableHead>
@@ -197,7 +194,7 @@ export function StockDashboard({
 
   if (error) {
     return (
-      <div suppressHydrationWarning className="text-red-500">
+      <div suppressHydrationWarning className="text-destructive">
         Error: {error}
       </div>
     );
@@ -207,18 +204,14 @@ export function StockDashboard({
     return (
       <div suppressHydrationWarning className="py-16 px-6 text-center">
         <div className="inline-block text-left max-w-xs">
-          <h3 className="text-lg font-semibold text-slate-100 mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             No positions yet
           </h3>
-          <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
             Your portfolio is empty. Begin by adding your first stock position
             to start tracking your investments.
           </p>
-          <Button
-            onClick={onToggleAdd}
-            variant="outline"
-            className="w-full border-slate-600 bg-slate-800/50 text-slate-200 hover:border-slate-500 hover:bg-slate-700 hover:text-slate-100"
-          >
+          <Button onClick={onToggleAdd} variant="outline" className="w-full">
             Add Position
           </Button>
         </div>
@@ -228,19 +221,18 @@ export function StockDashboard({
 
   return (
     <ScrollArea suppressHydrationWarning>
-      <Card
-        suppressHydrationWarning
-        className="bg-transparent border-0 text-slate-100"
-      >
-        <CardContent className="px-0 py-0">
+      <Card suppressHydrationWarning className="border-0 shadow-none">
+        <CardContent className="p-0">
           <Table
             suppressHydrationWarning
-            className="w-full border-separate border-spacing-y-1"
+            className="w-full caption-bottom text-sm"
+            style={{ color: "#fafafa" }}
           >
-            <TableHeader>
+            <TableHeader className="[&_tr]:border-b">
               <TableRow
                 suppressHydrationWarning
-                className="border-b border-slate-800 bg-slate-900 hover:bg-slate-900"
+                className="border-border hover:bg-transparent"
+                style={{ color: "#fafafa" }}
               >
                 <SortableHeader
                   label="Symbol"
@@ -292,16 +284,15 @@ export function StockDashboard({
                   onSort={handleSort}
                   getSortIndicator={getSortIndicator}
                 />
-                <TableHead className={`${TABLE_HEAD_CLASS} text-right`}>
+                <TableHead className="h-12 px-4 text-left align-middle text-right">
                   Actions
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="[&_tr:last-child]:border-0">
               {sortedStocks.map((stock: Stock) => {
-                // Get all styling decisions from centralized helper
-                const { rowClass, priceTextClass, dcaTextClass, highlightRow } =
-                  getRowStyles(stock);
+                // Get styling decisions from centralized helper
+                const { highlightRow } = getRowStyles(stock);
 
                 // Use unique position ID for key, fallback to symbol if no position
                 const rowKey = stock.id || stock.symbol;
@@ -310,58 +301,69 @@ export function StockDashboard({
                   <TableRow
                     suppressHydrationWarning
                     key={rowKey}
-                    className={rowClass}
+                    className={`border-b transition-colors data-[state=selected]:bg-muted ${
+                      highlightRow
+                        ? "bg-accent/50 hover:bg-accent/60"
+                        : "border-border hover:bg-accent/30"
+                    }`}
                     data-testid={`position-row-${stock.symbol}`}
                     data-dca-highlighted={highlightRow.toString()}
                   >
-                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 font-medium text-slate-200 text-xs sm:text-sm whitespace-nowrap min-w-[90px] border-r border-slate-700/50">
+                    <TableCell className="p-4 align-middle font-medium text-xs sm:text-sm whitespace-nowrap border-r border-border/50">
                       <SourceIndicator source={stock.source} />
                       {stock.symbol}
                     </TableCell>
                     <TableCell
-                      className={`px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-right whitespace-nowrap min-w-[90px] ${priceTextClass}`}
+                      className={`p-4 align-middle text-xs sm:text-sm text-right whitespace-nowrap ${highlightRow ? "text-primary" : ""}`}
                     >
                       {stock.price.toFixed(2)}{" "}
-                      <span className="text-[10px] sm:text-xs text-slate-400">
+                      <span className="text-[10px] sm:text-xs text-muted-foreground">
                         {stock.currency}
                       </span>
                     </TableCell>
-                    <TableCell
-                      className={`px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-right min-w-[80px] ${
-                        stock.change >= 0 ? "text-emerald-400" : "text-red-400"
-                      }`}
-                    >
-                      {stock.change.toFixed(2)}
+                    <TableCell className="text-right">
+                      <span
+                        className={`font-semibold ${
+                          stock.change >= 0
+                            ? "text-primary"
+                            : "text-destructive"
+                        }`}
+                        style={{
+                          fontFamily:
+                            'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                        }}
+                      >
+                        {stock.change >= 0 ? "+" : ""}
+                        {stock.change.toFixed(2)}%
+                      </span>
                     </TableCell>
-                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-200 text-right min-w-[70px]">
+                    <TableCell className="p-4 align-middle text-xs sm:text-sm text-right">
                       {stock.shares}
                     </TableCell>
-                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-200 text-right min-w-[100px]">
+                    <TableCell className="p-4 align-middle text-xs sm:text-sm text-right">
                       {stock.buyPrice ? `${stock.buyPrice.toFixed(2)}` : "-"}{" "}
                       {stock.buyPrice && (
-                        <span className="text-[10px] sm:text-xs text-slate-400">
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">
                           {stock.currency}
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-right min-w-[110px]">
+                    <TableCell className="p-4 align-middle text-right">
                       <ProfitCell stock={stock} />
                     </TableCell>
-                    <TableCell
-                      className={`px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-right min-w-[90px] ${dcaTextClass}`}
-                    >
+                    <TableCell className="p-4 align-middle text-xs sm:text-sm text-right">
                       {stock.dca ? `${stock.dca.toFixed(2)}` : "—"}{" "}
                       {stock.dca && (
-                        <span className="text-[10px] sm:text-xs text-slate-400">
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">
                           {stock.currency}
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="px-2 py-1.5 sm:px-4 sm:py-2 text-right min-w-[80px]">
+                    <TableCell className="p-4 align-middle text-right">
                       <div className="flex justify-end gap-1">
                         <Button
                           variant="ghost"
-                          size="icon-sm"
+                          size="icon"
                           onClick={() => {
                             const position = (positions || []).find(
                               (p) => p.symbol === stock.symbol,
@@ -370,19 +372,19 @@ export function StockDashboard({
                               onEditPosition?.(position);
                             }
                           }}
-                          className="hover:bg-blue-500/20 hover:text-blue-400"
+                          className="hover:bg-primary/20 hover:text-primary"
                           aria-label={`Edit ${stock.symbol}`}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="w-4 h-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon-sm"
+                          size="icon"
                           onClick={() => onRemovePosition?.(stock.symbol)}
-                          className="hover:bg-red-500/20 hover:text-red-400"
+                          className="hover:bg-destructive/20 hover:text-destructive"
                           aria-label={`Remove ${stock.symbol}`}
                         >
-                          <X className="h-4 w-4" />
+                          <X className="w-4 h-4" />
                         </Button>
                       </div>
                     </TableCell>

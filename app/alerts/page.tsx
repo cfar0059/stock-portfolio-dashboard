@@ -4,17 +4,17 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function AlertsPage() {
   return (
-    <div className="min-h-screen text-slate-100 px-6 py-8">
+    <div className="min-h-screen text-foreground px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-100">Alerts</h1>
-        <p className="text-sm text-slate-400 mt-2">
+        <h1 className="text-3xl font-bold text-foreground">Alerts</h1>
+        <p className="text-sm text-muted-foreground mt-2">
           Manage DCA triggers and price alerts
         </p>
       </div>
 
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-12 text-center">
-          <p className="text-slate-400">
+          <p className="text-muted-foreground">
             Alert configuration and notifications coming soon.
           </p>
         </CardContent>
@@ -22,4 +22,3 @@ export default function AlertsPage() {
     </div>
   );
 }
-

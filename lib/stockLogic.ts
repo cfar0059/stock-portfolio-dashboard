@@ -131,19 +131,16 @@ export const getRowStyles = (stock: Stock) => {
   // Core DCA logic: check if price is within ±5% of DCA target
   const highlightRow = isAtOrBelowDca(stock.price, stock.dca);
 
-  // Row container className
-  // Applies highlight only if price is within range of DCA target
-  const rowClass = `border-b last:border-b-0 hover:bg-slate-900/60 transition-colors ${
-    highlightRow ? "border-sky-500/40 bg-slate-800/60" : "border-slate-800"
+  // Row container className - no border highlight, just subtle background when close to DCA
+  const rowClass = `border-b last:border-b-0 hover:bg-accent/30 transition-colors ${
+    highlightRow ? "bg-accent/50" : "border-border"
   }`;
 
-  // Price cell text color: highlight if within ±5% of DCA target
-  // This is the PRIMARY visual indicator that DCA action is warranted
-  const priceTextClass = highlightRow ? "text-sky-400" : "text-slate-200";
+  // Price cell text color: #16a249 when close to DCA target
+  const priceTextClass = highlightRow ? "" : ""; // Will be handled inline with style
 
   // DCA cell text color: Always neutral (displays the stored DCA target)
-  // The DCA cell shows user's target value
-  const dcaTextClass = "text-slate-200";
+  const dcaTextClass = "";
 
   return {
     rowClass,

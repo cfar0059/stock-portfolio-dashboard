@@ -32,14 +32,14 @@ interface KPICardProps {
  */
 function KPICard({ label, value, valueColor }: KPICardProps) {
   return (
-    <Card className="bg-slate-900/50 border-slate-800 rounded-lg">
+    <Card className="bg-card border-border rounded-lg">
       <CardContent className="p-6">
         <div className="space-y-2">
-          <p className="text-xs sm:text-sm font-medium text-slate-400 uppercase tracking-wide">
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
             {label}
           </p>
           <p
-            className={`text-lg sm:text-2xl font-semibold ${valueColor || "text-slate-100"}`}
+            className={`text-lg sm:text-2xl font-semibold ${valueColor || "text-foreground"}`}
           >
             {value}
           </p>
@@ -89,33 +89,33 @@ function HoldingsAllocationTable({
   });
 
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-900/30 overflow-hidden">
+    <div className="rounded-lg border border-border bg-card/30 overflow-hidden">
       <div className="overflow-x-auto">
         <Table suppressHydrationWarning className="w-full">
           <TableHeader>
             <TableRow
               suppressHydrationWarning
-              className="border-b border-slate-800 bg-slate-900/50 hover:bg-slate-900/50"
+              className="border-b border-border bg-card/50 hover:bg-card/50"
             >
-              <TableHead className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              <TableHead className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Ticker
               </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Quantity
               </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Avg Cost
               </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Cost Basis
               </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Current Value
               </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Weight (%)
               </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              <TableHead className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Success Rate (%)
               </TableHead>
             </TableRow>
@@ -125,24 +125,24 @@ function HoldingsAllocationTable({
               <TableRow
                 suppressHydrationWarning
                 key={row.ticker}
-                className="border-b border-slate-800 hover:bg-slate-900/40 transition-colors"
+                className="border-b border-border hover:bg-accent/40 transition-colors"
               >
-                <TableCell className="px-4 py-3 text-sm font-medium text-slate-100">
+                <TableCell className="px-4 py-3 text-sm font-medium text-foreground">
                   {row.ticker}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-sm text-right text-slate-200">
+                <TableCell className="px-4 py-3 text-sm text-right text-foreground">
                   {row.quantity}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-sm text-right text-slate-200">
+                <TableCell className="px-4 py-3 text-sm text-right text-foreground">
                   ${formatCurrency(row.avgCost)}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-sm text-right text-slate-200">
+                <TableCell className="px-4 py-3 text-sm text-right text-foreground">
                   ${formatCurrency(row.costBasis)}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-sm text-right text-slate-200">
+                <TableCell className="px-4 py-3 text-sm text-right text-foreground">
                   ${formatCurrency(row.currentValue)}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-sm text-right text-slate-200">
+                <TableCell className="px-4 py-3 text-sm text-right text-foreground">
                   {formatPercentage(row.weight)}
                 </TableCell>
                 <TableCell
@@ -263,10 +263,10 @@ export default function ProfilePage() {
         // Empty State
         <div className="py-20 px-6 text-center">
           <div className="inline-block text-left max-w-md">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">
+            <h2 className="text-xl font-semibold text-foreground mb-3">
               No positions yet
             </h2>
-            <p className="text-sm text-slate-400 mb-8 leading-relaxed">
+            <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
               Your portfolio performance overview will appear here once you add
               your first stock position. Start building your portfolio to track
               capital efficiency and growth.
@@ -274,7 +274,7 @@ export default function ProfilePage() {
             <Link href="/">
               <Button
                 variant="outline"
-                className="w-full border-slate-600 bg-slate-800/50 text-slate-200 hover:border-slate-500 hover:bg-slate-700 hover:text-slate-100"
+                className="w-full border-border bg-card text-foreground hover:border-ring hover:bg-accent hover:text-foreground"
               >
                 Go to Dashboard
               </Button>

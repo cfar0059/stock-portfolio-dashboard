@@ -4,17 +4,17 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function PositionsPage() {
   return (
-    <div className="min-h-screen text-slate-100 px-6 py-8">
+    <div className="min-h-screen text-foreground px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-100">Positions</h1>
-        <p className="text-sm text-slate-400 mt-2">
+        <h1 className="text-3xl font-bold text-foreground">Positions</h1>
+        <p className="text-sm text-muted-foreground mt-2">
           Detailed position management and analytics
         </p>
       </div>
 
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-12 text-center">
-          <p className="text-slate-400">
+          <p className="text-muted-foreground">
             Positions page coming soon. For now, use Overview to manage your
             positions.
           </p>

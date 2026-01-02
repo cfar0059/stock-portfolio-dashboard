@@ -38,7 +38,7 @@ export function AddPositionForm({
   };
 
   return (
-    <div className="mb-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+    <div className="mb-4 rounded-lg border border-border bg-card/60 p-4">
       <form onSubmit={handleFormSubmit}>
         <div className="mb-3 grid gap-3 md:grid-cols-4">
           <div>
@@ -107,11 +107,11 @@ export function AddPositionForm({
                 type="submit"
                 variant="ghost"
                 size="icon"
-                className="hover:bg-emerald-500/20"
+                className="hover:bg-primary/20"
                 aria-label="Save Position"
                 data-testid="save-position-button"
               >
-                <Check className="h-4 w-4 text-emerald-500" />
+                <Check className="h-4 w-4 text-primary" />
               </Button>
               {isEditing && onCancel && (
                 <Button
@@ -119,16 +119,18 @@ export function AddPositionForm({
                   onClick={onCancel}
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-red-500/20"
+                  className="hover:bg-destructive/20"
                   aria-label="Cancel"
                 >
-                  <X className="h-4 w-4 text-red-500" />
+                  <X className="h-4 w-4 text-destructive" />
                 </Button>
               )}
             </div>
           </div>
         </div>
-        {formError && <p className="mb-0 text-xs text-red-400">{formError}</p>}
+        {formError && (
+          <p className="mb-0 text-xs text-destructive">{formError}</p>
+        )}
       </form>
     </div>
   );

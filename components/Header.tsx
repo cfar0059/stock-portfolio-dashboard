@@ -14,13 +14,13 @@ export function Header({ isAddOpen, onRefresh, onToggleAdd }: HeaderProps) {
       </div>
       <div className="flex gap-3">
         <button
-          className="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 cursor-pointer hover:bg-slate-200 transition-colors"
+          className="rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground cursor-pointer hover:bg-secondary/80 transition-colors"
           onClick={onRefresh}
         >
           Refresh
         </button>
         <button
-          className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100 cursor-pointer hover:bg-slate-700 transition-colors"
+          className="rounded-md bg-muted px-4 py-2 text-sm font-medium text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
           onClick={onToggleAdd}
         >
           {isAddOpen ? "Close" : "Add Position"}
