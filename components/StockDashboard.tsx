@@ -6,6 +6,14 @@ import type { Stock, StockResponse } from "@/lib/stockData";
 import type { Position } from "@/lib/positions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import LoadingIndicator from "@/components/ui/loading-indicator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Table,
   TableBody,
@@ -15,7 +23,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SourceIndicator } from "@/components/SourceIndicator";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { calculateProfit } from "@/lib/calculateProfit";
 import { formatCurrency } from "@/lib/formatting";
 import {
@@ -26,6 +33,18 @@ import {
 
 // Constants
 // (mergePositionsWithStocks, sortStocks, isAtOrBelowDca imported from lib/stockLogic)
+
+/**
+ * Check if current price is within 2% ABOVE the DCA target
+ * Shows alert when: price >= dca AND (price - dca) / dca <= 0.02
+ */
+function isDcaProximityAlert(price: number, dca: number | undefined): boolean {
+  if (!dca || dca <= 0) return false;
+  if (price < dca) return false; // Price is below DCA, not in proximity range
+
+  const percentageAbove = (price - dca) / dca;
+  return percentageAbove <= 0.02; // Within 2% above
+}
 
 interface StockDashboardProps {
   symbols: string[];
@@ -95,11 +114,17 @@ function SortableHeader({
     "dca",
   ].includes(column);
 
+  // Apply sticky positioning to Symbol column on mobile
+  const isSymbolColumn = column === "symbol";
+  const stickyClasses = isSymbolColumn
+    ? "lg:static sticky left-0 z-30 bg-card lg:shadow-none shadow-[2px_0_4px_rgba(0,0,0,0.1)]"
+    : "";
+
   return (
     <TableHead
       className={`h-12 px-4 text-left align-middle cursor-pointer hover:bg-accent/50 transition-colors ${
         isNumeric ? "text-right" : ""
-      } ${hasSeparator ? "border-r border-border/50" : ""}`}
+      } ${hasSeparator ? "border-r border-border/50" : ""} ${stickyClasses}`}
       onClick={() => onSort(column)}
     >
       {label}{" "}
@@ -189,7 +214,30 @@ export function StockDashboard({
   };
 
   if (loading) {
-    return <div suppressHydrationWarning>Loading stocks...</div>;
+    return (
+      <TooltipProvider>
+        <Card suppressHydrationWarning className="border-0 shadow-none">
+          <CardContent className="p-0">
+            <Table
+              suppressHydrationWarning
+              className="w-full caption-bottom text-sm"
+              style={{ color: "#fafafa" }}
+            >
+              <TableBody className="[&_tr:last-child]:border-0">
+                <TableRow className="border-b transition-colors hover:bg-accent/30">
+                  <TableCell
+                    colSpan={8}
+                    className="p-12 text-center align-middle"
+                  >
+                    <LoadingIndicator label="Loading stocks..." size="md" />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </TooltipProvider>
+    );
   }
 
   if (error) {
@@ -220,12 +268,12 @@ export function StockDashboard({
   }
 
   return (
-    <ScrollArea suppressHydrationWarning>
+    <TooltipProvider>
       <Card suppressHydrationWarning className="border-0 shadow-none">
         <CardContent className="p-0">
           <Table
             suppressHydrationWarning
-            className="w-full caption-bottom text-sm"
+            className="w-full min-w-[760px] caption-bottom text-sm relative border-separate border-spacing-0"
             style={{ color: "#fafafa" }}
           >
             <TableHeader className="[&_tr]:border-b">
@@ -309,7 +357,11 @@ export function StockDashboard({
                     data-testid={`position-row-${stock.symbol}`}
                     data-dca-highlighted={highlightRow.toString()}
                   >
-                    <TableCell className="p-4 align-middle font-medium text-xs sm:text-sm whitespace-nowrap border-r border-border/50">
+                    <TableCell
+                      className={`p-4 align-middle font-medium text-xs sm:text-sm whitespace-nowrap border-r border-border/50 lg:static sticky left-0 z-20 lg:shadow-none shadow-[2px_0_4px_rgba(0,0,0,0.1)] ${
+                        highlightRow ? "bg-accent" : "bg-card"
+                      }`}
+                    >
                       <SourceIndicator source={stock.source} />
                       {stock.symbol}
                     </TableCell>
@@ -352,11 +404,33 @@ export function StockDashboard({
                       <ProfitCell stock={stock} />
                     </TableCell>
                     <TableCell className="p-4 align-middle text-xs sm:text-sm text-right">
-                      {stock.dca ? `${stock.dca.toFixed(2)}` : "—"}{" "}
-                      {stock.dca && (
-                        <span className="text-[10px] sm:text-xs text-muted-foreground">
-                          {stock.currency}
+                      {stock.dca ? (
+                        <span className="inline-flex items-center gap-2 justify-end">
+                          {isDcaProximityAlert(stock.price, stock.dca) && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge
+                                  variant="default"
+                                  tabIndex={0}
+                                  className="cursor-pointer"
+                                >
+                                  Alert
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Price is within 2% of your DCA level.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                          <span>
+                            {stock.dca.toFixed(2)}{" "}
+                            <span className="text-[10px] sm:text-xs text-muted-foreground">
+                              {stock.currency}
+                            </span>
+                          </span>
                         </span>
+                      ) : (
+                        "—"
                       )}
                     </TableCell>
                     <TableCell className="p-4 align-middle text-right">
@@ -372,7 +446,7 @@ export function StockDashboard({
                               onEditPosition?.(position);
                             }
                           }}
-                          className="hover:bg-primary/20 hover:text-primary"
+                          className="hover:bg-primary/20 hover:text-primary cursor-pointer"
                           aria-label={`Edit ${stock.symbol}`}
                         >
                           <Pencil className="w-4 h-4" />
@@ -381,7 +455,7 @@ export function StockDashboard({
                           variant="ghost"
                           size="icon"
                           onClick={() => onRemovePosition?.(stock.symbol)}
-                          className="hover:bg-destructive/20 hover:text-destructive"
+                          className="hover:bg-destructive/20 hover:text-destructive cursor-pointer"
                           aria-label={`Remove ${stock.symbol}`}
                         >
                           <X className="w-4 h-4" />
@@ -395,7 +469,6 @@ export function StockDashboard({
           </Table>
         </CardContent>
       </Card>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+    </TooltipProvider>
   );
 }
