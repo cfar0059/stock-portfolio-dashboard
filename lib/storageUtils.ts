@@ -11,6 +11,31 @@ const POSITIONS_STORAGE_KEY = "portfolio-positions";
 const DEFAULT_POSITIONS: Position[] = [];
 
 /**
+ * Normalize symbol for comparison: trim + uppercase
+ */
+function normalizeSymbol(symbol: string): string {
+  return symbol.trim().toUpperCase();
+}
+
+/**
+ * Deduplicate positions by normalized symbol (keep first occurrence)
+ * This is a hard guard to prevent duplicate entries
+ * @param positions - Array of positions to dedupe
+ * @returns Deduplicated array (first occurrence wins)
+ */
+function deduplicatePositions(positions: Position[]): Position[] {
+  const seen = new Set<string>();
+  return positions.filter((position) => {
+    const normalized = normalizeSymbol(position.symbol);
+    if (seen.has(normalized)) {
+      return false; // Skip duplicate
+    }
+    seen.add(normalized);
+    return true;
+  });
+}
+
+/**
  * Get positions from localStorage
  * Safe for client-side use only (called after hydration in useEffect)
  * @returns Position array
@@ -34,11 +59,14 @@ export function getPositionsFromStorage(): Position[] {
 /**
  * Save positions to localStorage
  * Called by Dashboard page when positions change
+ * INVARIANT: Deduplicates by normalized symbol to prevent duplicate entries
  * @param positions - Position array to persist
  */
 export function savePositionsToStorage(positions: Position[]): void {
   try {
-    const stringified = JSON.stringify(positions);
+    // Hard guard: deduplicate before saving
+    const dedupedPositions = deduplicatePositions(positions);
+    const stringified = JSON.stringify(dedupedPositions);
 
     globalThis.localStorage.setItem(POSITIONS_STORAGE_KEY, stringified);
   } catch (error) {

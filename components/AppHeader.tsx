@@ -3,52 +3,9 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import {
-  Bell,
-  LayoutDashboard,
-  List,
-  Menu,
-  Settings,
-  TrendingUp,
-  User,
-  User as UserIcon,
-  X,
-} from "lucide-react";
+import { Menu, Settings, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface NavItem {
-  id: string;
-  label: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const navItems: NavItem[] = [
-  {
-    id: "overview",
-    label: "Overview",
-    href: "/overview",
-    icon: LayoutDashboard,
-  },
-  { id: "positions", label: "Positions", href: "/positions", icon: List },
-  {
-    id: "benchmarks",
-    label: "Benchmarks",
-    href: "/benchmarks",
-    icon: TrendingUp,
-  },
-  { id: "alerts", label: "Alerts", href: "/alerts", icon: Bell },
-  { id: "profile", label: "Profile", href: "/profile", icon: UserIcon },
-];
-
-// Route to page title mapping
-const pageTitles: Record<string, string> = {
-  "/overview": "Overview",
-  "/positions": "Positions",
-  "/benchmarks": "Benchmarks",
-  "/alerts": "Alerts",
-  "/profile": "Profile",
-};
+import { navItems, pageTitles } from "@/lib/navigation";
 
 // Fixed header height for consistent spacing
 const HEADER_HEIGHT = "h-14";
@@ -109,7 +66,7 @@ export function AppHeader() {
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="text-sm font-medium text-foreground">{pageTitle}</h1>
+          <h1 className="text-sm font-bold text-foreground">{pageTitle}</h1>
         </div>
 
         {/* Right: Settings + Profile */}
@@ -117,19 +74,21 @@ export function AppHeader() {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
+            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
             aria-label="Settings"
           >
             <Settings className="w-4 h-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
-            aria-label="Profile"
-          >
-            <User className="w-4 h-4" />
-          </Button>
+          <Link href="/profile">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+              aria-label="Profile"
+            >
+              <User className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
       </header>
 

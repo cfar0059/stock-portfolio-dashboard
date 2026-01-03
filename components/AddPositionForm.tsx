@@ -107,7 +107,7 @@ export function AddPositionForm({
                 type="submit"
                 variant="ghost"
                 size="icon"
-                className="hover:bg-primary/20"
+                className="hover:bg-primary/20 cursor-pointer"
                 aria-label="Save Position"
                 data-testid="save-position-button"
               >
@@ -119,7 +119,7 @@ export function AddPositionForm({
                   onClick={onCancel}
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-destructive/20"
+                  className="hover:bg-destructive/20 cursor-pointer"
                   aria-label="Cancel"
                 >
                   <X className="h-4 w-4 text-destructive" />

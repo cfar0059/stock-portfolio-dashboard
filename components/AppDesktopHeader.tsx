@@ -1,17 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Route to page title mapping
-const pageTitles: Record<string, string> = {
-  "/overview": "Overview",
-  "/positions": "Positions",
-  "/benchmarks": "Benchmarks",
-  "/alerts": "Alerts",
-  "/profile": "Profile",
-};
+import { pageTitles } from "@/lib/navigation";
 
 // Fixed header height for consistent spacing
 const DESKTOP_HEADER_HEIGHT = "h-12";
@@ -26,7 +19,7 @@ export function AppDesktopHeader() {
     >
       {/* Page Title */}
       <div className="flex items-center">
-        <h1 className="text-sm font-medium text-foreground">{pageTitle}</h1>
+        <h1 className="text-sm font-bold text-foreground">{pageTitle}</h1>
       </div>
 
       {/* Actions */}
@@ -34,19 +27,21 @@ export function AppDesktopHeader() {
         <Button
           variant="ghost"
           size="icon-sm"
-          className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
+          className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
           aria-label="Settings"
         >
           <Settings className="w-4 h-4" />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
-          aria-label="Profile"
-        >
-          <User className="w-4 h-4" />
-        </Button>
+        <Link href="/profile">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+            aria-label="Profile"
+          >
+            <User className="w-4 h-4" />
+          </Button>
+        </Link>
       </div>
     </header>
   );

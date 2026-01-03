@@ -2,32 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Bell, LayoutDashboard, List, TrendingUp, User } from "lucide-react";
-
-interface NavItem {
-  id: string;
-  label: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const navItems: NavItem[] = [
-  {
-    id: "overview",
-    label: "Overview",
-    href: "/overview",
-    icon: LayoutDashboard,
-  },
-  { id: "positions", label: "Positions", href: "/positions", icon: List },
-  {
-    id: "benchmarks",
-    label: "Benchmarks",
-    href: "/benchmarks",
-    icon: TrendingUp,
-  },
-  { id: "alerts", label: "Alerts", href: "/alerts", icon: Bell },
-  { id: "profile", label: "Profile", href: "/profile", icon: User },
-];
+import { navItems } from "@/lib/navigation";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -42,7 +17,7 @@ export function AppSidebar() {
       <div className="p-6 border-b border-sidebar-border">
         <Link
           href="/overview"
-          className="flex items-center hover:opacity-80 transition-opacity"
+          className="flex items-center hover:opacity-80 transition-opacity cursor-pointer"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="JustDCA Logo" className="h-8 w-auto" />
@@ -60,7 +35,7 @@ export function AppSidebar() {
                 key={item.id}
                 href={item.href}
                 suppressHydrationWarning
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
                   active
                     ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                     : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"

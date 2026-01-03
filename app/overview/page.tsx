@@ -3,19 +3,15 @@
 
 import { useEffect, useState } from "react";
 import { PositionsSection } from "@/components/PositionsSection";
+import { AddPositionDialog } from "@/components/AddPositionDialog";
 import { Position } from "@/lib/positions";
-import { validatePosition } from "@/lib/validation";
 import { localStoragePortfolioRepository } from "@/lib/portfolio/localStorageRepository";
 
 export default function OverviewPage() {
   const [refreshToken, setRefreshToken] = useState(0);
   const [positions, setPositions] = useState<Position[]>([]);
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newSymbol, setNewSymbol] = useState("");
-  const [newShares, setNewShares] = useState("");
-  const [newBuyPrice, setNewBuyPrice] = useState("");
-  const [newDca, setNewDca] = useState("");
-  const [formError, setFormError] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
   const [editingPosition, setEditingPosition] = useState<Position | null>(null);
   const [hasHydrated, setHasHydrated] = useState(false);
 
@@ -36,83 +32,46 @@ export default function OverviewPage() {
     new Set(positions.map((p) => p.symbol.toUpperCase())),
   );
 
-  function handleAddPosition() {
-    setFormError(null);
-
-    // Validate all fields at once
-    const validationError = validatePosition(
-      newSymbol,
-      newShares,
-      newBuyPrice,
-      newDca,
-    );
-    if (validationError) {
-      setFormError(validationError);
-      return;
-    }
-
-    // All validations passed, safe to convert to numbers
-    const trimmedSymbol = newSymbol.trim().toUpperCase();
-    const sharesNumber = Number(newShares);
-    const buyPriceNumber = Number(newBuyPrice);
-    const dcaNumber = newDca ? Number(newDca) : undefined;
-
-    if (editingPosition) {
+  // Handle modal submit (both add and edit)
+  function handleDialogSubmit(
+    positionData: Omit<Position, "id">,
+    editingId?: string,
+  ) {
+    if (editingId) {
       // Update existing position
       setPositions((prev) =>
         prev.map((position) =>
-          position.id === editingPosition.id
-            ? {
-                ...position,
-                symbol: trimmedSymbol,
-                shares: sharesNumber,
-                buyPrice: buyPriceNumber,
-                dca: dcaNumber,
-              }
+          position.id === editingId
+            ? { ...position, ...positionData }
             : position,
         ),
       );
     } else {
       // Create new position
       const newPosition: Position = {
-        id: `${trimmedSymbol}-${Date.now()}`,
-        symbol: trimmedSymbol,
-        shares: sharesNumber,
-        buyPrice: buyPriceNumber,
-        dca: dcaNumber,
+        id: `${positionData.symbol}-${Date.now()}`,
+        ...positionData,
       };
       setPositions((prev) => [...prev, newPosition]);
     }
-
-    // Clear form and exit edit mode
-    setNewSymbol("");
-    setNewShares("");
-    setNewBuyPrice("");
-    setNewDca("");
-    setEditingPosition(null);
-    setIsAddOpen(false);
     setRefreshToken((prev) => prev + 1);
   }
 
+  // Open modal in edit mode
   function handleEditPosition(position: Position) {
     setEditingPosition(position);
-    setNewSymbol(position.symbol);
-    setNewShares(String(position.shares));
-    setNewBuyPrice(String(position.buyPrice));
-    setNewDca(position.dca ? String(position.dca) : "");
-    setIsAddOpen(true);
-    setFormError(null);
+    setDialogMode("edit");
+    setIsDialogOpen(true);
   }
 
-  function handleCancelEdit() {
+  // Open modal in create mode
+  function handleOpenAddDialog() {
     setEditingPosition(null);
-    setNewSymbol("");
-    setNewShares("");
-    setNewBuyPrice("");
-    setNewDca("");
-    setFormError(null);
+    setDialogMode("create");
+    setIsDialogOpen(true);
   }
 
+  // Remove a position
   function handleRemovePosition(symbol: string) {
     setPositions((prev) =>
       prev.filter((position) => position.symbol !== symbol),
@@ -120,32 +79,31 @@ export default function OverviewPage() {
   }
 
   return (
-    <div
-      suppressHydrationWarning
-      className="min-h-screen text-foreground px-6 py-8"
-    >
-      <PositionsSection
-        isAddOpen={isAddOpen}
-        symbols={symbols}
+    <>
+      <div
+        suppressHydrationWarning
+        className="min-h-screen text-foreground px-6 py-8"
+      >
+        <PositionsSection
+          symbols={symbols}
+          positions={positions}
+          refreshToken={refreshToken}
+          onEditPosition={handleEditPosition}
+          onRemovePosition={handleRemovePosition}
+          onRefresh={() => setRefreshToken((prev) => prev + 1)}
+          onToggleAdd={handleOpenAddDialog}
+        />
+      </div>
+
+      {/* Unified Add/Edit Position Dialog */}
+      <AddPositionDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        mode={dialogMode}
         positions={positions}
-        refreshToken={refreshToken}
-        newSymbol={newSymbol}
-        newShares={newShares}
-        newBuyPrice={newBuyPrice}
-        newDca={newDca}
-        formError={formError}
-        editingPosition={editingPosition}
-        onSymbolChange={setNewSymbol}
-        onSharesChange={setNewShares}
-        onBuyPriceChange={setNewBuyPrice}
-        onDcaChange={setNewDca}
-        onAddPosition={handleAddPosition}
-        onEditPosition={handleEditPosition}
-        onCancelEdit={handleCancelEdit}
-        onRemovePosition={handleRemovePosition}
-        onRefresh={() => setRefreshToken((prev) => prev + 1)}
-        onToggleAdd={() => setIsAddOpen((prev) => !prev)}
+        initialValues={editingPosition || undefined}
+        onSubmit={handleDialogSubmit}
       />
-    </div>
+    </>
   );
 }
