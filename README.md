@@ -156,7 +156,7 @@ stock-portfolio-dashboard/
 │   ├── layout.tsx           # Root layout
 │   └── page.tsx             # Dashboard/overview page
 ├── components/              # React components
-│   ├── Navbar.tsx           # Top navigation
+│   ├── AppSidebar.tsx       # Desktop navigation
 │   ├── PositionsSection.tsx # Positions management
 │   ├── AddPositionForm.tsx  # Add/edit position form
 │   ├── StockDashboard.tsx   # Positions table
@@ -332,4 +332,3 @@ For issues, questions, or feature requests, contact the development team or open
 ---
 
 Built with care for modern portfolio management
-

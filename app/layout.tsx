@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Navbar } from "@/components/Navbar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { AppHeader } from "@/components/AppHeader";
+import { AppDesktopHeader } from "@/components/AppDesktopHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,13 +29,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#020817]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <Navbar />
-        <main className="pt-16">{children}</main>
+        <AppSidebar />
+        <AppHeader />
+        <AppDesktopHeader />
+        {/* Mobile: pt-14 for mobile header | Desktop: lg:ml-64 for sidebar, lg:pt-12 for desktop header */}
+        <main className="pt-14 lg:ml-64 lg:pt-12 min-h-screen">{children}</main>
       </body>
     </html>
   );

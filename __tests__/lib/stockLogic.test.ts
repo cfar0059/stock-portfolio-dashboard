@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  getRowStyles,
-  isAtOrBelowDca,
-  mergePositionsWithStocks,
-  sortStocks,
-} from "@/lib/stockLogic";
+import { getRowStyles, isAtOrBelowDca, mergePositionsWithStocks, sortStocks } from "@/lib/stockLogic";
 import type { Position, Stock } from "@/lib/types";
 
 describe("isAtOrBelowDca", () => {
@@ -114,10 +109,10 @@ describe("getRowStyles", () => {
       const result = getRowStyles(stock);
 
       expect(result.highlightRow).toBe(true);
-      expect(result.rowClass).toContain("border-sky-500/40");
-      expect(result.rowClass).toContain("bg-slate-800/60");
-      expect(result.priceTextClass).toBe("text-sky-400");
-      expect(result.dcaTextClass).toBe("text-slate-200");
+      expect(result.rowClass).not.toContain("border-sky-500/40");
+      expect(result.rowClass).toContain("bg-accent/50");
+      expect(result.priceTextClass).toBe("");
+      expect(result.dcaTextClass).toBe("");
     });
 
     it("should apply highlight when price equals DCA", () => {
@@ -133,7 +128,7 @@ describe("getRowStyles", () => {
       const result = getRowStyles(stock);
 
       expect(result.highlightRow).toBe(true);
-      expect(result.priceTextClass).toBe("text-sky-400");
+      expect(result.priceTextClass).toBe("");
     });
   });
 
@@ -151,7 +146,7 @@ describe("getRowStyles", () => {
       const result = getRowStyles(stock);
 
       expect(result.highlightRow).toBe(true);
-      expect(result.priceTextClass).toBe("text-sky-400");
+      expect(result.priceTextClass).toBe("");
     });
 
     it("should NOT apply highlight when price is above +5% of DCA", () => {
@@ -167,9 +162,9 @@ describe("getRowStyles", () => {
       const result = getRowStyles(stock);
 
       expect(result.highlightRow).toBe(false);
-      expect(result.rowClass).toContain("border-slate-800");
+      expect(result.rowClass).toContain("border-border");
       expect(result.rowClass).not.toContain("border-sky-500");
-      expect(result.priceTextClass).toBe("text-slate-200");
+      expect(result.priceTextClass).toBe("");
     });
   });
 
@@ -187,9 +182,9 @@ describe("getRowStyles", () => {
       const result = getRowStyles(stock);
 
       expect(result.highlightRow).toBe(false);
-      expect(result.rowClass).toContain("border-slate-800");
-      expect(result.priceTextClass).toBe("text-slate-200");
-      expect(result.dcaTextClass).toBe("text-slate-200");
+      expect(result.rowClass).toContain("border-border");
+      expect(result.priceTextClass).toBe("");
+      expect(result.dcaTextClass).toBe("");
     });
 
     it("should NOT apply highlight when DCA is not provided in stock object", () => {
@@ -221,7 +216,7 @@ describe("getRowStyles", () => {
 
       expect(result.rowClass).toContain("border-b");
       expect(result.rowClass).toContain("last:border-b-0");
-      expect(result.rowClass).toContain("hover:bg-slate-900/60");
+      expect(result.rowClass).toContain("hover:bg-accent/30");
       expect(result.rowClass).toContain("transition-colors");
     });
   });
