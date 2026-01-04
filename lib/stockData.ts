@@ -94,6 +94,7 @@ export async function fetchStockFromAPI(symbol: string): Promise<Stock> {
       symbol: normalizedSymbol,
       price: data.c,
       change: data.d ?? 0,
+      changePercent: typeof data.dp === "number" ? data.dp : 0,
       currency: "USD",
       source: "live",
     };
