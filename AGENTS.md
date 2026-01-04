@@ -81,6 +81,29 @@ When generating or modifying code, AI assistants must **not**:
 
 Prefer small, reversible diffs over refactors.
 
+### Phase 1 Backend Foundation Exception
+
+AI assistants MAY introduce backend infrastructure **only** for foundational setup purposes, provided that:
+
+- No frontend behavior is changed
+- No existing persistence logic is modified or removed
+- localStorage remains the single source of truth for user data in Phase 1
+- No authentication, users, or accounts are introduced
+- No business logic, alerts, or CRUD flows are wired to the UI
+- The backend is limited to:
+  - NestJS application scaffolding
+  - Environment configuration
+  - Database connectivity (Postgres)
+  - Prisma schema and migrations
+  - Health-check endpoints only
+
+Any backend code added at this stage must be:
+- Isolated under `apps/api`
+- Unused by the frontend
+- Safe to delete without affecting the application
+
+Anything beyond infrastructure scaffolding is Phase 2 and must be proposed explicitly.
+
 ---
 
 ## 5. Architecture & Code Ownership
