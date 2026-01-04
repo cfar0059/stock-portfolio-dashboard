@@ -6,6 +6,18 @@ Track your stock positions, monitor performance metrics, and optimize your Dolla
 
 ---
 
+## LLM Collaboration Snapshot (read this first)
+
+- **Guardrails:** See `AGENTS.md` (Phase 1 scope; UI only with shadcn/Tailwind; no auth, predictions, or extra charts; backend allowed only as isolated infra under `apps/api`).
+- **Environments:** Frontend uses `.env.local` for `FINNHUB_API_KEY`; backend uses `apps/api/.env` (sample in `apps/api/.env.example`) for `DATABASE_URL` and `API_PORT`.
+- **Data contract:** Frontend persistence is **browser localStorage** in Phase 1. External data comes from Finnhub; handle nulls, stale data, and rate limits.
+- **Key codepaths:** Next.js App Router under `app/`; stock fetcher at `app/api/stocks/route.ts`.
+- **Backend scaffold:** NestJS API in `apps/api` with Prisma `Position` model (`apps/api/prisma/schema.prisma`), health check at `GET /health`, CORS for `http://localhost:3000`.
+- **Infra:** `docker-compose.yml` provides Postgres (`db` service) on `localhost:5432` with env-driven credentials and a named volume.
+- **Testing:** Unit tests required for new logic in `lib/`; Playwright E2E when persistence/Add Position/DCA highlighting/metrics change.
+
+---
+
 ## Features
 
 ### Dashboard Overview
@@ -332,3 +344,28 @@ For issues, questions, or feature requests, contact the development team or open
 ---
 
 Built with care for modern portfolio management
+## Local Postgres via Docker Compose
+
+Spin up a local database for development:
+
+- `docker compose up -d`
+- `docker compose down`
+
+The service is defined in `docker-compose.yml` and exposes Postgres on `localhost:5432` with a persistent volume.
+Set `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, and `POSTGRES_PORT` before running compose (copy `.env.example` to `.env` or export them in your shell).
+
+## Backend API (NestJS)
+
+Location: `apps/api`
+
+1) Start Postgres: `docker compose up -d`
+2) Copy env: `cp apps/api/.env.example apps/api/.env`
+3) Install deps: `cd apps/api && npm install`
+4) Run migrations: `cd apps/api && npx prisma migrate dev --name init`
+5) Start dev server on port 4000: `cd apps/api && npm run start:dev`
+
+## Additional Docs
+- `docs/llm-guide.md` — how to use LLMs safely on this repo
+- `docs/architecture.md` — high-level system layout
+- `docs/runbooks/local-dev.md` — quick steps for frontend/backend + DB
+- `docs/api/backend.md` — NestJS/Prisma scaffold details
