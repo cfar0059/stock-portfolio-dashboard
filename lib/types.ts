@@ -23,7 +23,8 @@ export type Stock = {
   id?: string; // Unique identifier from position (used for React keys)
   symbol: string;
   price: number;
-  change: number;
+  change: number; // Point change
+  changePercent: number; // Percentage change
   currency: string;
   source: "cache" | "live";
   shares?: number; // From position

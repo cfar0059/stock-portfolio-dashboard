@@ -374,20 +374,27 @@ export function StockDashboard({
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <span
-                        className={`font-semibold ${
-                          stock.change >= 0
-                            ? "text-primary"
-                            : "text-destructive"
-                        }`}
+                      <div
+                        className="flex flex-col items-end gap-0.5 text-xs sm:text-sm"
                         style={{
                           fontFamily:
                             'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
                         }}
                       >
-                        {stock.change >= 0 ? "+" : ""}
-                        {stock.change.toFixed(2)}%
-                      </span>
+                        <span
+                          className={`font-semibold ${
+                            stock.change >= 0
+                              ? "text-primary"
+                              : "text-destructive"
+                          }`}
+                        >
+                          {stock.change >= 0 ? "+" : ""}
+                          {stock.change.toFixed(2)}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          ({stock.changePercent.toFixed(2)}%)
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell className="p-4 align-middle text-xs sm:text-sm text-right">
                       {stock.shares}

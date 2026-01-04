@@ -30,6 +30,7 @@ async function mockStockPrices(page: Page, priceMap: Record<string, number>) {
       symbol: symbol.toUpperCase(),
       price: priceMap[symbol.toUpperCase()] || 100,
       change: 0,
+      changePercent: 0,
       currency: "USD",
       source: "live",
     }));
