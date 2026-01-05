@@ -7,12 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Portfolio {
+  id               String     @id @default(cuid())
+  recoveryCodeHash String     @unique
+  recoveryCodeSalt String
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  positions        Position[]
+}
+
 model Position {
-  id        String   @id @default(cuid())
-  symbol    String
-  shares    Decimal
-  buyPrice  Decimal
-  dcaPrice  Decimal?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  symbol      String
+  shares      Decimal
+  buyPrice    Decimal
+  dcaPrice    Decimal?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId])
 }
