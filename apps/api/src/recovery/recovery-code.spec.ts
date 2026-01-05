@@ -26,7 +26,7 @@ describe("recovery-code helpers", () => {
   });
 
   it("validates format and character set", () => {
-    expect(isValidRecoveryCode("ABCDEFGH-JKMN-PQRS-2345")).toBe(true);
+    expect(isValidRecoveryCode("ABCD-EFGH-JKMN-PQRS")).toBe(true);
     expect(isValidRecoveryCode("abcd efgh ijkl mnop")).toBe(true);
     expect(isValidRecoveryCode("ABCDE123I0")).toBe(false);
     expect(isValidRecoveryCode("TOO-SHORT")).toBe(false);
