@@ -4,7 +4,7 @@ const config: Config = {
   preset: "ts-jest",
   testEnvironment: "node",
   rootDir: __dirname,
-  testMatch: ["**/*.spec.ts"],
+  testMatch: ["**/*.spec.ts", "**/test/**/*.e2e.spec.ts"],
   transform: {
     "^.+\\.ts$": [
       "ts-jest",
@@ -13,6 +13,8 @@ const config: Config = {
       },
     ],
   },
+  // Increase timeout for e2e tests that need DB connection
+  testTimeout: 30000,
 };
 
 export default config;

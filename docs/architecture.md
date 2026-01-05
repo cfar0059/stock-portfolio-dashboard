@@ -16,11 +16,17 @@
 - **Location:** `apps/api`
 - **Framework:** NestJS (port 4000), CORS for `http://localhost:3000` in non-prod
 - **Env:** `@nestjs/config` with zod validation (`apps/api/src/config/env.schema.ts`)
-- **Health:** `GET /health`
+- **Health:**
+  - `GET /health` — liveness probe
+  - `GET /health/ready` — readiness probe (DB connectivity check)
 - **Persistence:** CRUD endpoints for portfolios/positions scoped by client-generated `portfolioId` (anonymous ownership, no auth/users/payments)
 - **ORM:** Prisma
   - Schema: `apps/api/prisma/schema.prisma` with `Position` model
   - Connection: `DATABASE_URL` env (Postgres)
+- **Production patterns:**
+  - Request ID middleware (UUID per request, `X-Request-Id` header)
+  - Global exception filter (consistent JSON error shape)
+  - Logging interceptor (method, path, status, duration, requestId)
 
 ## Recovery Code (Anonymous Linking)
 - **Generation:** Created when a portfolio is first made; human-friendly (10–12 chars, uppercase, avoid O/0/I/1); shown once on creation.
@@ -48,6 +54,7 @@
 ## Testing
 - Unit tests expected for new logic in `lib/`.
 - Playwright E2E required when changing Add Position flow, persistence, DCA highlighting, or portfolio metrics.
+- Backend tests: `cd apps/api && npm test` (includes health endpoint E2E tests).
 
 ## Deployment
 - Frontend: standard Next.js pipeline (see README).

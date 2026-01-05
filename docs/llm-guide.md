@@ -9,9 +9,15 @@ Read this first before using an LLM on the project. Keep responses aligned with 
 - Backend is NestJS + Prisma + Postgres under `apps/api`; allowed endpoints are health + portfolio/position CRUD with server-side validation.
 
 ## Allowed backend endpoints (Phase 1.1)
-- `GET /health`.
+- `GET /health` — liveness probe.
+- `GET /health/ready` — readiness probe (checks DB connectivity).
 - CRUD endpoints for portfolios/positions scoped by client-generated `portfolioId` (read/create/update/delete).
 - Validate inputs: require `portfolioId`, trim/upper-case symbols, enforce positive numeric fields, and reject missing/null payloads gracefully.
+
+## Backend production patterns
+- **Request ID:** Every request gets a UUID via middleware; available on `req.requestId` and `X-Request-Id` header.
+- **Error responses:** Consistent JSON shape `{ error: { code, message, requestId }, meta: { path, timestamp } }`.
+- **Logging:** HTTP requests logged with method, path, status, duration, requestId.
 
 ## Key files to read
 - `AGENTS.md` — scope, guardrails, testing expectations.
@@ -19,7 +25,9 @@ Read this first before using an LLM on the project. Keep responses aligned with 
 - `app/api/stocks/route.ts` — stock fetch API (Finnhub).
 - `lib/types.ts` — shared types (Stock, Position, etc.).
 - `apps/api/prisma/schema.prisma` — backend data model (Position).
-- `apps/api/src/main.ts` — Nest bootstrap (port, CORS).
+- `apps/api/src/main.ts` — Nest bootstrap (port, CORS, middleware, filters, interceptors).
+- `apps/api/src/common/` — production patterns (request-id, exception filter, logging).
+- `apps/api/test/` — E2E tests for health endpoints.
 - `docker-compose.yml` — local Postgres service.
 
 ## Environments
@@ -41,3 +49,4 @@ Read this first before using an LLM on the project. Keep responses aligned with 
 - Lint: `npm run lint`
 - Playwright: `npm run test:e2e`
 - Backend dev: see `docs/runbooks/local-dev.md`
+- Backend tests: `cd apps/api && npm test`
