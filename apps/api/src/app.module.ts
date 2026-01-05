@@ -4,6 +4,7 @@ import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { validateEnv } from "./config/env.schema";
 import { join } from "path";
+import { PortfolioModule } from "./portfolio/portfolio.module";
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { join } from "path";
     }),
     PrismaModule,
     HealthModule,
+    PortfolioModule,
   ],
 })
 export class AppModule {}

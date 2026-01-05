@@ -3,11 +3,12 @@ import {
   randomInt,
   scryptSync,
   timingSafeEqual,
+  createHash,
 } from "node:crypto";
 
 export const RECOVERY_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 export const RECOVERY_CODE_LENGTH = 16;
-const NORMALIZED_RECOVERY_CODE_ALPHABET = `${RECOVERY_CODE_ALPHABET}01`;
+export const ALLOWED_NORMALIZED_CHARS = `${RECOVERY_CODE_ALPHABET}01`;
 
 const HASH_BYTE_LENGTH = 64;
 const SALT_BYTE_LENGTH = 16;
@@ -24,10 +25,8 @@ export function normalizeRecoveryCodeInput(input: string): string {
   const normalized = input
     .replace(/[\s-]+/g, "")
     .toUpperCase()
-    .replace(/[OIL]/g, (char) => {
-      if (char === "O") return "0";
-      return "1";
-    });
+    .replace(/O/g, "0")
+    .replace(/[IL]/g, "1");
   if (!normalized) {
     throw new Error("Recovery code is required");
   }
@@ -41,7 +40,7 @@ function assertValidNormalizedRecoveryCode(code: string): void {
     );
   }
   for (const char of code) {
-    if (!NORMALIZED_RECOVERY_CODE_ALPHABET.includes(char)) {
+    if (!ALLOWED_NORMALIZED_CHARS.includes(char)) {
       throw new Error("Recovery code contains invalid characters");
     }
   }
@@ -64,7 +63,11 @@ export function generateRecoveryCode(): string {
       RECOVERY_CODE_ALPHABET[randomInt(RECOVERY_CODE_ALPHABET.length)];
     canonicalCode += nextChar;
   }
-  return canonicalCode.match(/.{1,4}/g)!.join("-");
+  const groups = canonicalCode.match(/.{4}/g);
+  if (!groups || groups.length * 4 !== RECOVERY_CODE_LENGTH) {
+    throw new Error("Failed to format recovery code");
+  }
+  return groups.join("-");
 }
 
 export function hashRecoveryCode(
@@ -82,6 +85,11 @@ export function hashRecoveryCode(
   };
 }
 
+export function recoveryCodeLookupKey(code: string): string {
+  const normalized = normalizeRecoveryCodeInput(code);
+  return createHash("sha256").update(normalized).digest("hex");
+}
+
 function isHexString(value: string): boolean {
   return /^[a-f0-9]+$/i.test(value) && value.length % 2 === 0;
 }
@@ -91,7 +99,13 @@ export function verifyRecoveryCode(
   expectedHash: string,
   salt: string,
 ): boolean {
-  if (!expectedHash || !salt || !isHexString(expectedHash)) {
+  if (
+    !expectedHash ||
+    !salt ||
+    !isHexString(expectedHash) ||
+    !isHexString(salt) ||
+    salt.length !== SALT_BYTE_LENGTH * 2
+  ) {
     return false;
   }
   try {

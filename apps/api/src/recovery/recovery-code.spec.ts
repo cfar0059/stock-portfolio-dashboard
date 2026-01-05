@@ -2,6 +2,7 @@ import {
   generateRecoveryCode,
   hashRecoveryCode,
   isValidRecoveryCode,
+  ALLOWED_NORMALIZED_CHARS,
   normalizeRecoveryCodeInput,
   RECOVERY_CODE_LENGTH,
   RECOVERY_CODE_ALPHABET,
@@ -16,7 +17,7 @@ describe("recovery-code helpers", () => {
     expect(normalized).toHaveLength(RECOVERY_CODE_LENGTH);
     expect(normalized).toMatch(/^[A-Z0-9]+$/);
     for (const char of normalized) {
-      expect(`${RECOVERY_CODE_ALPHABET}01`).toContain(char);
+      expect(ALLOWED_NORMALIZED_CHARS).toContain(char);
     }
   });
 
@@ -51,5 +52,13 @@ describe("recovery-code helpers", () => {
 
     expect(verifyRecoveryCode(code, "not-hex", salt)).toBe(false);
     expect(verifyRecoveryCode(code, hash, "")).toBe(false);
+    expect(verifyRecoveryCode(code, hash, "zzzz")).toBe(false);
+    expect(
+      verifyRecoveryCode(
+        code,
+        hash,
+        salt.slice(0, -2), // wrong length
+      ),
+    ).toBe(false);
   });
 });

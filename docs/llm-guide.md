@@ -3,10 +3,15 @@
 Read this first before using an LLM on the project. Keep responses aligned with product scope and guardrails.
 
 ## Must-know constraints
-- Source of truth: `AGENTS.md` (Phase 1 scope, UI rules, backend infra-only under `apps/api`).
+- Source of truth: `AGENTS.md` (Phase 1 scope, UI rules, backend persistence rules under `apps/api`).
 - No auth, no trading signals/predictions, no extra charts, no new state managers or UI kits.
-- Frontend persistence is **localStorage** (Phase 1); Finnhub is the only external price source and may be unreliable.
-- Backend is scaffold-only (NestJS, Prisma, Postgres) and not wired to the frontend yet.
+- Persistence uses an anonymous `portfolioId` stored in `localStorage`; frontend may persist portfolio/positions via backend API (Phase 1.1).
+- Backend is NestJS + Prisma + Postgres under `apps/api`; allowed endpoints are health + portfolio/position CRUD with server-side validation.
+
+## Allowed backend endpoints (Phase 1.1)
+- `GET /health`.
+- CRUD endpoints for portfolios/positions scoped by client-generated `portfolioId` (read/create/update/delete).
+- Validate inputs: require `portfolioId`, trim/upper-case symbols, enforce positive numeric fields, and reject missing/null payloads gracefully.
 
 ## Key files to read
 - `AGENTS.md` — scope, guardrails, testing expectations.
@@ -36,4 +41,3 @@ Read this first before using an LLM on the project. Keep responses aligned with 
 - Lint: `npm run lint`
 - Playwright: `npm run test:e2e`
 - Backend dev: see `docs/runbooks/local-dev.md`
-
