@@ -19,7 +19,7 @@ import {
   getMetricColor,
 } from "@/lib/portfolioMetrics";
 import { formatCurrency, formatPercentage } from "@/lib/formatting";
-import { localStoragePortfolioRepository } from "@/lib/portfolio/localStorageRepository";
+import { backendPortfolioRepository } from "@/lib/portfolio/backendRepository";
 
 interface KPICardProps {
   label: string;
@@ -179,19 +179,26 @@ export default function ProfilePage() {
     }
   }
 
-  // Load positions from localStorage and fetch stock data
+  // Load positions from backend (with localStorage fallback) and fetch stock data
   useEffect(() => {
-    const stored = localStoragePortfolioRepository.getPositions();
-    setPositions(stored);
+    async function loadData() {
+      try {
+        const stored = await backendPortfolioRepository.loadPositions();
+        setPositions(stored);
 
-    // Fetch stock data for all positions with shares > 0
-    const activeSymbols = stored
-      .filter((p) => p.shares > 0)
-      .map((p) => p.symbol.toUpperCase());
+        // Fetch stock data for all positions with shares > 0
+        const activeSymbols = stored
+          .filter((p: Position) => p.shares > 0)
+          .map((p: Position) => p.symbol.toUpperCase());
 
-    if (activeSymbols.length > 0) {
-      void fetchStocks(activeSymbols);
+        if (activeSymbols.length > 0) {
+          void fetchStocks(activeSymbols);
+        }
+      } catch (error) {
+        console.error("Failed to load positions:", error);
+      }
     }
+    loadData();
   }, []);
 
   // Calculate active positions (shares > 0)
