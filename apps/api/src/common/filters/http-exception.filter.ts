@@ -7,6 +7,7 @@ import {
   Logger,
 } from "@nestjs/common";
 import { Response } from "express";
+import { ZodError } from "zod";
 import { RequestWithId } from "../middleware/request-id.middleware";
 
 /**
@@ -77,6 +78,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
     message: string;
     code: string;
   } {
+    // Handle ZodError validation errors
+    if (exception instanceof ZodError) {
+      const message = exception.errors
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
+        .join("; ");
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message,
+        code: "VALIDATION_ERROR",
+      };
+    }
+
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const message = this.extractMessage(exception);
