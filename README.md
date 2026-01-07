@@ -1,8 +1,8 @@
-# Stock Portfolio Dashboard
+# JustDCA
 
-A modern, responsive stock portfolio management application built with **Next.js 15.5.9**, **React 19**, **TypeScript**, **Tailwind CSS v4**, and **shadcn/ui**.
+A beginner-friendly investment companion built with **Next.js 15.5.9**, **React 19**, **TypeScript**, **Tailwind CSS v4**, and **shadcn/ui**.
 
-Track your stock positions, monitor performance metrics, and optimize your Dollar Cost Averaging (DCA) strategy in a sleek, dark-themed dashboard.
+JustDCA helps new investors build confidence and discipline with their Dollar Cost Averaging (DCA) strategy. Track positions, monitor performance, and understand when you're buying high or low — all in a clean, focused interface.
 
 ---
 
@@ -161,7 +161,7 @@ All steps must pass before code can be merged. The CI workflow is defined in `.g
 ### Project Structure
 
 ```
-stock-portfolio-dashboard/
+justdca/
 ├── app/                      # Next.js App Router
 │   ├── api/stocks/          # API route for fetching stock data
 │   ├── profile/             # Profile/analytics page
@@ -343,7 +343,7 @@ For issues, questions, or feature requests, contact the development team or open
 
 ---
 
-Built with care for modern portfolio management
+Built with care for beginner investors who want clarity, not complexity.
 ## Local Postgres via Docker Compose
 
 Spin up a local database for development:

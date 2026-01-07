@@ -1,5 +1,21 @@
 # Product Brief — JustDCA
 
+## Current Status
+
+**V1 Delivery Progress:**
+- Core dashboard and navigation — *shipped*
+- Position management (add, edit, delete) — *shipped*
+- Portfolio metrics (total value, invested, P/L) — *shipped*
+- DCA level tracking with visual highlighting — *shipped*
+- Local persistence (browser localStorage) — *shipped*
+- Cross-device sync via recovery codes — *in progress*
+- Portfolio benchmarking vs index — *not started*
+- DCA proximity notifications — *not started* (deferred; requires notification infrastructure)
+
+**Current Phase:** V1 core functionality with anonymous persistence (no accounts/auth).
+
+---
+
 ## Introduction
 
 JustDCA is a product designed for beginner-to-intermediate retail investors who feel overwhelmed by market noise and lack a simple, trustworthy way to understand their portfolio and make confident Dollar Cost Averaging (DCA) decisions.
@@ -84,7 +100,30 @@ JustDCA is intentionally opinionated about what it does not attempt to solve.
 * The product is not designed for day traders, short-term speculators, or users seeking frequent transactional activity.  
 * JustDCA does not guarantee returns or protect users from losses; investment risk always remains with the user.
 
-The product’s role is to support disciplined decision-making, not to control outcomes. JustDCA provides structure, context, and reminders that help users apply their own strategy consistently and responsibly.
+The product's role is to support disciplined decision-making, not to control outcomes. JustDCA provides structure, context, and reminders that help users apply their own strategy consistently and responsibly.
+
+## Cross-Device Access (Recovery Codes)
+
+JustDCA deliberately avoids user accounts and authentication in V1. Instead, cross-device access is provided through anonymous recovery codes.
+
+**How it works:**
+1. When a user first creates a portfolio, a unique recovery code is generated and shown once
+2. The user saves this code (the app does not store the plaintext)
+3. On a new device, the user enters the code to restore their portfolio
+4. The code links to a `portfolioId` stored server-side; the code itself is hashed before storage
+
+**Design rationale:**
+* Removes friction of account creation for a simple tool
+* Preserves privacy (no email, no personal data)
+* Encourages the user to take ownership of their access
+* Aligns with the product philosophy of simplicity and discipline
+
+**Limitations (intentional for V1):**
+* No code regeneration or recovery if lost
+* No email-based backup
+* User is responsible for saving the code
+
+This approach trades convenience for privacy and simplicity. Future versions may introduce optional account linking for users who want it.
 
 ## Risks & Trade-offs
 
@@ -104,25 +143,31 @@ Version one of JustDCA focuses exclusively on delivering clarity, structure, and
 
 Core V1 capabilities include:
 
-* A simple, intuitive dashboard with clear navigation  
-* Core portfolio metrics, including:  
-  * Individual positions  
-  * Total portfolio value  
-  * Total invested capital and unrealised profit/loss  
-* Portfolio benchmarking against a major index fund (e.g. S\&P 500\)  
-* A positions table displaying:  
-  * Symbol  
-  * Current price and daily change  
-  * Shares held  
-  * Buy price  
-  * Profit/loss  
-  * User-defined DCA level  
-  * Basic position actions (add, edit, remove)  
-* A clear and lightweight Add Position flow  
-* DCA proximity alerts that notify users when prices approach predefined DCA levels (email notifications)  
-* A profile or summary view consolidating portfolio performance and benchmark comparisons
+* A simple, intuitive dashboard with clear navigation
+* Core portfolio metrics, including:
+  * Individual positions
+  * Total portfolio value
+  * Total invested capital and unrealised profit/loss
+* A positions table displaying:
+  * Symbol
+  * Current price and daily change
+  * Shares held
+  * Buy price
+  * Profit/loss
+  * User-defined DCA level with visual highlighting when price is at or below target
+  * Basic position actions (add, edit, remove)
+* A clear and lightweight Add Position flow
+* Cross-device portfolio access via recovery codes (no account required)
+* A profile or summary view consolidating portfolio performance
 
 These features collectively enable users to track their portfolio, understand context, and act deliberately when opportunities arise.
+
+### V1.1 — Planned Extensions (Post-Core)
+
+These features remain part of V1 but are sequenced after core functionality is stable:
+
+* Portfolio benchmarking against a major index fund (e.g. S&P 500)
+* DCA proximity notifications (requires notification infrastructure — email or push)
 
 ### Future Bets — Explicitly Not V1
 
